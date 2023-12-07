@@ -1,0 +1,17 @@
+.container {
+	border: 2px solid rgb(0, 0, 0);
+	background-color: white;
+	width: fit-content;
+	height: fit-content;
+	padding: 5px 20px;
+	font-size: 1.5rem;
+	border-radius: 0.5rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.container:hover {
+	background-color: black;
+	color: white;
+	transform: scale(1.05);
+}

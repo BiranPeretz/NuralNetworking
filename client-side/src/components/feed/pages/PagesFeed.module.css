@@ -1,0 +1,6 @@
+.feed {
+	position: relative; /* changed from fixed */
+	width: 600px;
+	display: flex;
+	flex-direction: column;
+}

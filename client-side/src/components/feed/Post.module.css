@@ -1,0 +1,34 @@
+.post {
+	position: relative;
+	height: auto;
+	width: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin-bottom: 20px;
+}
+
+.post__header {
+	padding-bottom: 10px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+	margin-bottom: 10px;
+}
+
+.date {
+	position: absolute;
+	right: 10px;
+}
+
+.date h5 {
+	color: rgb(189, 180, 180);
+}
+
+.content {
+	margin-bottom: 15px;
+}
+
+.content .content__text {
+	font-family: inherit;
+	font-size: 18px;
+	white-space: pre-wrap;
+}

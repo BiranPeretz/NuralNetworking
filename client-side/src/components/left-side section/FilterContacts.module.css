@@ -1,0 +1,38 @@
+.filter-buttons {
+	position: relative;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	background-color: rgb(216, 219, 218);
+	left: 2%;
+	width: 96%;
+	height: 30px;
+	border-radius: 10px;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.filter-buttons button {
+	width: calc(100% / 3);
+	height: 100%;
+	background-color: transparent;
+	border: 1px solid black;
+	cursor: pointer;
+	transition: background-color 100ms;
+}
+
+.filter-buttons button:not(:last-child) {
+	border-right-width: 0px;
+}
+
+.filter-buttons button:first-child {
+	border-radius: 10px 0px 0px 10px;
+}
+.filter-buttons button:last-child {
+	border-radius: 0px 10px 10px 0px;
+}
+
+.filter-buttons button:hover,
+.filter-buttons .active {
+	background-color: rgb(255, 255, 255);
+}

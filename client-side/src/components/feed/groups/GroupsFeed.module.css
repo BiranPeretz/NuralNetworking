@@ -1,0 +1,46 @@
+/* .feed {
+	position: fixed;
+	left: 50%;
+	top: 10%;
+	transform: translateX(-50%);
+	overflow-y: auto;
+	width: 600px;
+	height: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+} */
+
+/* .feed {
+	position: fixed;
+	left: 50%;
+	top: 10%;
+	bottom: 3%;
+	transform: translateX(-50%);
+	overflow: hidden;
+	width: 600px;
+	display: flex;
+	flex-direction: column;
+} */
+
+/* .feed::-webkit-scrollbar {
+	display: none;
+}
+
+.feed {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+} */
+
+.feed {
+	position: relative; /* changed from fixed */
+	width: 600px;
+	display: flex;
+	flex-direction: column;
+}
+
+.action-buttons {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}

@@ -1,0 +1,20 @@
+.suggestions {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	/* border: 1px solid blue; */
+}
+
+.list-container {
+	width: 100%;
+	/* border: 1px solid red; */
+	display: flex;
+	flex-direction: column;
+	margin-top: 15px;
+}
+
+.no-items-msg {
+	color: rgb(156, 156, 156);
+}

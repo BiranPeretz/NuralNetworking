@@ -1,0 +1,13 @@
+.menu {
+	/* position: fixed; */
+	/* top: 60px;
+	right: 0px; */
+	/* background-color: rgb(146, 255, 103); */
+	/* height: calc(100% - 60px); */
+	/* width: 15%; */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0px 10px 0px 10px;
+	/* border: 2px solid rgb(61, 0, 141); */
+}
