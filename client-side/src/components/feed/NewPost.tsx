@@ -6,6 +6,7 @@ import Modal from "../UI/Modal";
 import NewPostForm from "./NewPostForm";
 import socialItemType from "../../types/socialItem";
 import { useGroupHosts } from "../../custom-hooks/useGroupHosts";
+import { usePageHosts } from "../../custom-hooks/usePageHosts";
 
 type Props = {
 	creatorType: "User" | "Group" | "Page";
@@ -24,7 +25,7 @@ const NewPost: React.FC<Props> = function (props) {
 			hostsArray = useGroupHosts();
 			console.log("hostArr group nested:	", hostsArray);
 		} else if (props.creatorType === "Page") {
-			// hostsArray = usePageHosts();
+			hostsArray = usePageHosts();
 			console.log("hostArr page nested:	", hostsArray);
 		}
 	}
