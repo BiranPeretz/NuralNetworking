@@ -10,6 +10,9 @@ router.use(authController.protect);
 //Get all pages
 router.get("/", pageController.getAllPages);
 
+//Get all pages owned by requesting user
+router.get("/getMyPages", pageController.getMyPages);
+
 //Create new page
 router.post("/createPage", pageController.createPage);
 

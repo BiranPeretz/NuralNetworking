@@ -9,6 +9,24 @@ const CRUDOperations = require("./CRUDOperations");
 //get all pages
 exports.getAllPages = CRUDOperations.getAll(Page);
 
+//get all the pages owned by requseting user
+exports.getMyPages = catchAsync(async function (req, res, next) {
+	//store requesting user's pages list as array
+	const pagesArr = req.user?.pagesList?.map((page) => page?.page.toString());
+
+	//find all pages owned by requesting user
+	const myPages = await Page.find({
+		_id: { $in: pagesArr },
+		ownerID: req.user._id.toString(),
+	}).select("_id name profilePicture");
+
+	//send response
+	res.status(200).json({
+		status: "success",
+		data: { myPages },
+	});
+});
+
 //Create new page
 exports.createPage = catchAsync(async function (req, res, next) {
 	//filter request's body properties
