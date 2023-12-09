@@ -1,0 +1,12 @@
+.feed {
+	position: relative;
+	width: 600px;
+	display: flex;
+	flex-direction: column;
+}
+
+.loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import classes from "./HomeFeed.module.css";
+import classes from "./FriendsFeed.module.css";
 import NewPost from "../NewPost";
 import Post from "../Post";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,7 +15,7 @@ type Props = {
 };
 
 //TODO: combine all feed components to one generic
-const HomeFeed: React.FC<Props> = function (props) {
+const FriendsFeed: React.FC<Props> = function (props) {
 	const scrollRef = useRef<any>();
 	const isFetching = useRef(false);
 	const hasRun = useRef(false); //For dev env
@@ -31,14 +31,23 @@ const HomeFeed: React.FC<Props> = function (props) {
 	const dispatch = useDispatch<AppDispatch>();
 	useEffect(() => {
 		if (import.meta.env.PROD || !hasRun.current) {
-			dispatch(fetchPosts("user-related", token!, false, undefined, true));
+			dispatch(
+				fetchPosts("user-related", token!, false, undefined, true, "friends")
+			);
 		}
 		hasRun.current = true; //For dev env
 	}, []);
 
 	const handleFetchPosts = function () {
 		dispatch(
-			fetchPosts("user-related", token!, isNoMoreItems, lastItemTimestamp)
+			fetchPosts(
+				"user-related",
+				token!,
+				isNoMoreItems,
+				lastItemTimestamp,
+				false,
+				"friends"
+			)
 		);
 	};
 
@@ -57,7 +66,14 @@ const HomeFeed: React.FC<Props> = function (props) {
 					console.log(posts);
 					// Fetch more data from your server here
 					dispatch(
-						fetchPosts("user-related", token!, isNoMoreItems, lastItemTimestamp)
+						fetchPosts(
+							"user-related",
+							token!,
+							isNoMoreItems,
+							lastItemTimestamp,
+							false,
+							"friends"
+						)
 					)
 						.catch((err) =>
 							console.error(
@@ -125,4 +141,4 @@ const HomeFeed: React.FC<Props> = function (props) {
 	);
 };
 
-export default HomeFeed;
+export default FriendsFeed;

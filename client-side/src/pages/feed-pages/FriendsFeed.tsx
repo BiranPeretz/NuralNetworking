@@ -1,15 +1,7 @@
-import { Fragment } from "react";
-//import classes from './FriendsFeedPage.module.css'
+import FriendsFeed from "../../components/feed/friends/FriendsFeed";
 
 const FriendsFeedPage = function () {
-	return (
-		<Fragment>
-			<h1>
-				<br />
-				Welcome to friends feed
-			</h1>
-		</Fragment>
-	);
+	return <FriendsFeed />;
 };
 
 export default FriendsFeedPage;

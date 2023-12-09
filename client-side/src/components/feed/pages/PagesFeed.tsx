@@ -54,13 +54,13 @@ const PagesFeed: React.FC<Props> = function (props) {
 
 	useEffect(() => {
 		const simpleBarInstance = scrollRef.current.getScrollElement();
+		const threshold = 350;
 
 		const handleScroll = function () {
 			if (!isFetching.current) {
 				const { scrollTop, scrollHeight, clientHeight } = simpleBarInstance;
 
-				if (scrollTop + clientHeight >= scrollHeight) {
-					console.log("Scrolled to the end!");
+				if (scrollTop + clientHeight >= scrollHeight - threshold) {
 					isFetching.current = true;
 
 					console.log(lastItemTimestamp);
