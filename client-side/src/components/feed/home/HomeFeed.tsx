@@ -4,11 +4,11 @@ import NewPost from "../NewPost";
 import Post from "../Post";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchPosts } from "../../../store/postsThunks";
-import { clearPostsData } from "../../../store/postsSlice";
 import type { RootState, AppDispatch } from "../../../store/store";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import getToken from "../../../util/getToken";
+import { FadeLoader } from "react-spinners";
 
 type Props = {
 	children?: React.ReactNode;
@@ -40,10 +40,6 @@ const HomeFeed: React.FC<Props> = function (props) {
 		dispatch(
 			fetchPosts("user-related", token!, isNoMoreItems, lastItemTimestamp)
 		);
-	};
-
-	const handleClearPosts = function () {
-		dispatch(clearPostsData());
 	};
 
 	useEffect(() => {
@@ -110,8 +106,19 @@ const HomeFeed: React.FC<Props> = function (props) {
 				{!isLoading && !isNoMoreItems && (
 					<button onClick={handleFetchPosts}>more</button>
 				)}
-				{!isLoading && <button onClick={handleClearPosts}>clear</button>}
-				{isLoading && <h5>Loading...</h5>}
+
+				{isLoading && (
+					<div className={classes.loader}>
+						<FadeLoader
+							color="#000000"
+							height={10}
+							margin={-4}
+							radius={2}
+							speedMultiplier={2}
+							width={5}
+						/>
+					</div>
+				)}
 				{isNoMoreItems && <h5>No more posts.</h5>}
 			</div>
 		</SimpleBar>

@@ -82,10 +82,6 @@ const PostInteractions: React.FC<Props> = function (props) {
 					)}
 					Comment
 				</button>
-				<button name="share" className={classes["interaction__button"]}>
-					<BsFillShareFill className={classes.icon} />
-					Share
-				</button>
 			</div>
 			{displayNewComment && (
 				<NewPostComment
