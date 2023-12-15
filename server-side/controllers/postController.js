@@ -4,12 +4,27 @@ const AppError = require("../utils/appError");
 const filterObjProperties = require("../utils/filterObjProperties");
 const fetchNextBatch = require("../utils/fetchNextBatch");
 const CRUDOperations = require("./CRUDOperations");
+const {
+	multerImageUpload,
+	cloudinaryImageUpload,
+} = require("./imageController");
 
 //get all posts
 exports.getAllPosts = CRUDOperations.getAll(Post);
 
 //Create new post
 exports.createPost = catchAsync(async function (req, res, next) {
+	//parse form-data request with multer
+	try {
+		await multerImageUpload(req, res);
+	} catch (err) {
+		return next(
+			new AppError(
+				`Error parsing data with multer: ${err.message}`,
+				err.statusCode || err.code || 500
+			)
+		);
+	}
 	//filter request properties
 	const filteredBody = filterObjProperties(
 		req.body,
@@ -25,13 +40,33 @@ exports.createPost = catchAsync(async function (req, res, next) {
 		if (creatingUserID === filteredBody.creatorID) {
 			return next(
 				new AppError(
-					`Post Type ${filteredBody.creatorType} should contain the hosting ${filteredBody.creatorType} ID as creatorID.`,
+					`Creator Type ${
+						filteredBody.creatorType
+					} should contain the hosting ${filteredBody.creatorType.toLowerCase()} ID as creatorID.`,
 					400
 				)
 			);
 		}
 
 		filteredBody.author = creatingUserID;
+	}
+
+	//upload image to cloudinary and store image url
+	let result;
+	if (req.file) {
+		try {
+			req.body.type = "postImage";
+			req.body.internalRequest = true;
+			result = await cloudinaryImageUpload(req, res, next);
+			filteredBody.content.image = result.url || "";
+		} catch (err) {
+			return next(
+				new AppError(
+					`Error uploading image to coudinary: ${err.message}`,
+					err.statusCode || err.code || 500
+				)
+			);
+		}
 	}
 
 	//create post
@@ -146,7 +181,6 @@ exports.like = catchAsync(async function (req, res, next) {
 	if (!post) {
 		return next(new AppError("Could not find any matching post.", 404));
 	}
-	console.log(post.likeList);
 	//check if user already liked this post
 	if (
 		post.likeList.some(

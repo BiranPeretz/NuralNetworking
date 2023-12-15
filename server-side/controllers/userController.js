@@ -8,6 +8,10 @@ const mongoose = require("mongoose");
 const CRUDOperations = require("./CRUDOperations");
 const suggestionAgg = require("../utils/suggestionAgg");
 const getListAgg = require("../utils/getListAgg");
+const {
+	multerImageUpload,
+	cloudinaryImageUpload,
+} = require("./imageController");
 
 //get all users
 exports.getAllUsers = CRUDOperations.getAll(User);
@@ -38,6 +42,17 @@ exports.getMyData = catchAsync(async function (req, res, next) {
 
 //Create user profile after signup/login before first login
 exports.createProfile = catchAsync(async function (req, res, next) {
+	//parse form-data request with multer
+	try {
+		await multerImageUpload(req, res);
+	} catch (err) {
+		return next(
+			new AppError(
+				`Error parsing data with multer: ${err.message}`,
+				err.statusCode || err.code || 500
+			)
+		);
+	}
 	//check if full name
 	if (!req.body.fullName) {
 		return next(new AppError("Please provide your full name.", 400));
@@ -50,6 +65,25 @@ exports.createProfile = catchAsync(async function (req, res, next) {
 	}
 	//filter req.body to filtered array
 	const filteredBody = filterObjProperties(req.body, ...filteredArray);
+
+	//upload image to cloudinary and store image url
+	let result;
+	if (req.file) {
+		try {
+			req.body.type = "profilePicture";
+			req.body.internalRequest = true;
+			result = await cloudinaryImageUpload(req, res, next);
+			filteredBody.profilePicture = result.url || "";
+		} catch (err) {
+			return next(
+				new AppError(
+					`Error uploading image to coudinary: ${err.message}`,
+					err.statusCode || err.code || 500
+				)
+			);
+		}
+	}
+
 	//update user data
 	const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
 		new: true,

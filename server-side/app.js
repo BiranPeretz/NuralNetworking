@@ -6,6 +6,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const cors = require("cors");
+const cloudinary = require("cloudinary").v2;
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
@@ -15,6 +16,7 @@ const groupRouter = require("./routes/groupRoutes");
 const pageRouter = require("./routes/pageRoutes");
 const commentRouter = require("./routes/commentRoutes");
 const notificationRouter = require("./routes/notificationRoutes");
+const imageRouter = require("./routes/imageRoutes");
 
 const app = express();
 
@@ -28,6 +30,13 @@ const corsOptions = {
 		}
 	},
 };
+
+// Set up cloudinary
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 app.use(cors(corsOptions));
 
@@ -63,12 +72,6 @@ app.use(
 	})
 );
 
-//Test middleware	//TODO: replace if needed and delete
-app.use((req, res, next) => {
-	req.requestTime = new Date().toISOString();
-	next();
-});
-
 //Routes
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
@@ -76,6 +79,7 @@ app.use("/groups", groupRouter);
 app.use("/pages", pageRouter);
 app.use("/comments", commentRouter);
 app.use("/notifications", notificationRouter);
+app.use("/images", imageRouter);
 
 //Catch unspecified routes
 app.all("*", (req, res, next) => {
