@@ -1,0 +1,22 @@
+.upload-file-container {
+	display: flex;
+	/* justify-content: space-between; */
+	align-items: center;
+}
+
+.upload-file-container button {
+	width: fit-content;
+	height: fit-content;
+	padding: 5px 10px 5px 10px;
+	border-radius: 25px;
+	margin-left: 10px;
+	background-color: rgb(210, 210, 210);
+}
+
+.file-uploader__modal {
+	z-index: 50;
+}
+
+.file-uploader__backdrop {
+	z-index: 40;
+}

@@ -7,6 +7,7 @@ import { AiOutlineClose } from "react-icons/ai";
 
 type Props = {
 	className?: string;
+	backdropClassName?: string;
 	children?: React.ReactNode;
 	title?: string;
 	onClose: () => void;
@@ -16,7 +17,10 @@ const Modal: React.FC<Props> = function (props) {
 	return (
 		<Fragment>
 			{ReactDOM.createPortal(
-				<Backdrop backdropClick={props.onClose} />,
+				<Backdrop
+					className={props.backdropClassName}
+					backdropClick={props.onClose}
+				/>,
 				document.getElementById("root-overlay")!
 			)}
 			<Card

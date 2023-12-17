@@ -13,6 +13,7 @@ export type postRequired = {
 	creatorType: "User" | "Group" | "Page";
 	creatorID: string | null;
 	author?: string | null;
+	image?: File;
 };
 
 type postType = {

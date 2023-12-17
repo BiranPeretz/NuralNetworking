@@ -3,6 +3,7 @@ import classes from "./NewPostForm.module.css";
 import { BsEmojiSmile } from "react-icons/bs";
 import { FaRegWindowClose } from "react-icons/fa";
 import { AiOutlinePicture } from "react-icons/ai";
+import { IoMdCheckmark } from "react-icons/io";
 import PostHeader from "./PostHeader";
 import { useDispatch } from "react-redux";
 import { createPost } from "../../store/postsThunks";
@@ -11,6 +12,9 @@ import type { postRequired } from "../../types/post";
 import type socialItemType from "../../types/socialItem";
 import OptionsModal from "../UI/OptionsModal";
 import Select from "react-select";
+import FileUpload from "../UI/FileUpload";
+import ReactDOM from "react-dom";
+import Modal from "../UI/Modal";
 
 type Props = {
 	creatorType: "User" | "Group" | "Page";
@@ -50,6 +54,9 @@ const NewPostForm: React.FC<Props> = function (props) {
 		y: 0,
 	});
 	const [displayEmoPicker, setDisplayEmoPicker] = useState<boolean>(false);
+	const [displayFileUploader, setDisplayFileUploader] =
+		useState<boolean>(false);
+	const [imageFile, setImageFile] = useState<any>();
 	const [selectedOption, setSelectedOption] = useState<any>(undefined);
 	const contentRef = useRef<HTMLTextAreaElement>(null);
 
@@ -80,6 +87,14 @@ const NewPostForm: React.FC<Props> = function (props) {
 		setDisplayEmoPicker(true);
 	};
 
+	const hideFileUploader = function () {
+		setDisplayFileUploader(false);
+	};
+
+	const showFileUploader = function () {
+		setDisplayFileUploader(true);
+	};
+
 	const onSubmitHandler = function (event: React.FormEvent) {
 		event.preventDefault();
 
@@ -87,12 +102,12 @@ const NewPostForm: React.FC<Props> = function (props) {
 			return;
 		}
 
-		//TODO: update image prop in post variable after supporting image image upload
 		const post: postRequired = {
-			content: { text: contentRef!.current!.value, image: "DEFINE IMAGE HERE" },
+			content: { text: contentRef!.current!.value },
 			creatorType: hostID ? props.creatorType : "User",
 			creatorID: hostID?._id || props.creatorID._id,
 			author: hostID ? props.creatorID._id : undefined,
+			image: imageFile || undefined,
 		};
 
 		dispatch(createPost(token!, post));
@@ -138,7 +153,21 @@ const NewPostForm: React.FC<Props> = function (props) {
 					<h3>More for your post</h3>
 
 					<div className={classes["add-ons__icons"]}>
-						<AiOutlinePicture className={classes.icon} size="30px" />
+						{imageFile ? (
+							<IoMdCheckmark
+								className={classes.icon}
+								size="28px"
+								color="#00ff37"
+								onClick={showFileUploader}
+							/>
+						) : (
+							<AiOutlinePicture
+								className={classes.icon}
+								size="30px"
+								onClick={showFileUploader}
+							/>
+						)}
+
 						{displayEmoPicker ? (
 							<FaRegWindowClose
 								className={classes.icon}
@@ -158,6 +187,7 @@ const NewPostForm: React.FC<Props> = function (props) {
 				<button className={classes.submit} type="submit">
 					<h2>post</h2>
 				</button>
+				<div></div>
 			</form>
 			{displayEmoPicker && (
 				<OptionsModal
@@ -166,6 +196,18 @@ const NewPostForm: React.FC<Props> = function (props) {
 					onEmojiSelect={addEmojiHandler}
 				/>
 			)}
+			{displayFileUploader &&
+				ReactDOM.createPortal(
+					<Modal
+						title="Upload your image"
+						onClose={hideFileUploader}
+						className={classes["file-uploader__modal"]}
+						backdropClassName={classes["file-uploader__backdrop"]}
+					>
+						<FileUpload setFile={setImageFile} />
+					</Modal>,
+					document.getElementById("root-overlay")!
+				)}
 		</Fragment>
 	);
 };

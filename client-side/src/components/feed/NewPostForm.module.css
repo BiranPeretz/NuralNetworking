@@ -118,3 +118,11 @@
 .item-select__span {
 	font-size: 1.2rem;
 }
+
+.file-uploader__modal {
+	z-index: 40;
+}
+
+.file-uploader__backdrop {
+	z-index: 30;
+}

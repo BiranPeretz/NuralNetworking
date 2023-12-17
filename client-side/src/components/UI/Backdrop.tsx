@@ -9,7 +9,14 @@ type Props = {
 
 const Backdrop: React.FC<Props> = function (props) {
 	return (
-		<div className={classes.backdrop} onClick={props.backdropClick}>
+		<div
+			className={
+				props.className
+					? `${classes.backdrop} ${props.className}`
+					: classes.backdrop
+			}
+			onClick={props.backdropClick}
+		>
 			{props.children}
 		</div>
 	);

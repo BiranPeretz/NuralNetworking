@@ -78,6 +78,21 @@ export const createPost = function (token: string, newPost: postRequired) {
 	return async function (dispatch: any) {
 		dispatch(fetchPostsStart());
 
+		const formData = new FormData();
+
+		formData.append("content[text]", newPost.content?.text || "");
+		formData.append("content[image]", newPost.content?.image || "");
+		formData.append("creatorType", newPost.creatorType);
+		if (newPost.creatorID) {
+			formData.append("creatorID", newPost.creatorID);
+		}
+		if (newPost.author) {
+			formData.append("author", newPost.author);
+		}
+		if (newPost.image) {
+			formData.append("image", newPost.image);
+		}
+
 		try {
 			const response = await fetch(
 				import.meta.env.VITE_SERVER_URL + `posts/createPost`,
@@ -85,9 +100,8 @@ export const createPost = function (token: string, newPost: postRequired) {
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(newPost),
+					body: formData,
 				}
 			);
 			const data = await response.json();

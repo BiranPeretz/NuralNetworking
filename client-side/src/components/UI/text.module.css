@@ -1,0 +1,7 @@
+.file-uploader__modal {
+	z-index: 50;
+}
+
+.file-uploader__backdrop {
+	z-index: 40;
+}
