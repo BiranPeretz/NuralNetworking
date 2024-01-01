@@ -28,6 +28,7 @@ const HomeFeed: React.FC<Props> = function (props) {
 	const { posts, lastItemTimestamp, isNoMoreItems, isLoading } = useSelector(
 		(state: RootState) => state.post
 	);
+
 	const dispatch = useDispatch<AppDispatch>();
 	useEffect(() => {
 		if (import.meta.env.PROD || !hasRun.current) {

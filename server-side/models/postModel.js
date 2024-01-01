@@ -41,7 +41,7 @@ const postSchema = new mongoose.Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: "User",
 		autopopulate: { select: "_id fullName profilePicture" },
-	}, //The post creator (for groups and pages posts)
+	}, //The post author (for groups and pages posts)
 	likeList: [
 		{
 			_id: false,

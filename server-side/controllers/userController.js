@@ -12,6 +12,7 @@ const {
 	multerImageUpload,
 	cloudinaryImageUpload,
 } = require("./imageController");
+const { createNotification } = require("./notificationController");
 
 //get all users
 exports.getAllUsers = CRUDOperations.getAll(User);
@@ -113,26 +114,42 @@ exports.addListItem = async function (req, res, next) {
 
 		let model;
 		let itemListName;
+		let notificationType;
+		let notificationInitiatorType;
 		switch (list) {
 			case "friendsList":
 				//limit adding friends for internal requests only
 				if (!req.body.internalRequest) {
-					throw new AppError("Adding an friend require their approval.", 403);
+					throw new AppError(
+						"Adding someone as friend require their approval.",
+						403
+					);
 				}
 				model = User;
 				itemListName = list;
+				notificationType = "new friend";
+				notificationInitiatorType = "User";
 				break;
+
 			case "groupsList":
 				model = Group;
 				itemListName = "membersList";
+				notificationType = "new member";
+				notificationInitiatorType = "Group";
 				break;
+
 			case "pagesList":
 				model = Page;
 				itemListName = "followersList";
+				notificationType = "new follower";
+				notificationInitiatorType = "Page";
 				break;
+
 			case "friendRequestsList":
 				model = User;
 				itemListName = list;
+				notificationType = "friend request";
+				notificationInitiatorType = "User";
 				break;
 		}
 
@@ -190,16 +207,45 @@ exports.addListItem = async function (req, res, next) {
 			}
 		);
 
+		//try creating notification for targer item
+		let notificationResponse;
+		try {
+			req.body.internalNotificationRequest = true;
+			//notification recieving user is: adminID for groups, ownerID for pages and request's body itemId for friends and friends requests
+			req.body.userID =
+				itemExists?.ownerID?.toString() ||
+				itemExists?.adminID?.toString() ||
+				itemId;
+			req.body.notificationType = notificationType;
+			req.body.initiatorType = notificationInitiatorType;
+			req.body.initiatorID = itemExists?._id.toString();
+			const results = await createNotification(req, res, next);
+			if (results.status === "success") {
+				notificationResponse = results;
+			}
+		} catch (error) {
+			console.log(error);
+			notificationResponse = error;
+		}
+
 		//send updated user to source
 		if (req.body.internalRequest) {
 			return {
 				status: "success",
-				data: { user: updatedUser, sourceItem: updatedItem },
+				data: {
+					user: updatedUser,
+					sourceItem: updatedItem,
+					notificationResponse,
+				},
 			};
 		} else {
 			res.status(200).json({
 				status: "success",
-				data: { user: updatedUser, sourceItem: updatedItem },
+				data: {
+					user: updatedUser,
+					sourceItem: updatedItem,
+					notificationResponse,
+				},
 			});
 		}
 	} catch (error) {

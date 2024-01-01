@@ -88,10 +88,6 @@ const userSchema = new mongoose.Schema({
 		{
 			type: mongoose.Schema.ObjectId,
 			ref: "Notification",
-			autopopulate: {
-				select:
-					"_id notificationType initiatorType initiatorID timestamp isRead",
-			},
 		},
 	],
 	passwordChangedAt: Date, //Last password change

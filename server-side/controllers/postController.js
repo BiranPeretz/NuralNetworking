@@ -8,6 +8,7 @@ const {
 	multerImageUpload,
 	cloudinaryImageUpload,
 } = require("./imageController");
+const { createNotification } = require("./notificationController");
 
 //get all posts
 exports.getAllPosts = CRUDOperations.getAll(Post);
@@ -34,6 +35,7 @@ exports.createPost = catchAsync(async function (req, res, next) {
 		"author"
 	);
 
+	//add author for groups and pages created posts that missing the author id.
 	if (filteredBody.creatorType !== "User" && !filteredBody.author) {
 		const creatingUserID = req.user._id;
 
@@ -197,12 +199,31 @@ exports.like = catchAsync(async function (req, res, next) {
 	//save updated post
 	await post.save();
 
+	//try to create notification for post owner
+	//TODO: consider exporting to util/notification util function
+	let notificationResponse;
+	try {
+		req.body.internalNotificationRequest = true;
+		req.body.userID = post.author || post.creatorID;
+		req.body.notificationType = "like";
+		req.body.initiatorType = "Post";
+		req.body.initiatorID = post._id.toString();
+		const results = await createNotification(req, res, next);
+		if (results.status === "success") {
+			notificationResponse = results;
+		}
+	} catch (error) {
+		console.log(error);
+		notificationResponse = error;
+	}
+
 	//send updated likeList
 	res.status(200).json({
 		status: "success",
 		data: {
 			postID: post._id,
 			likeList: post.likeList,
+			notificationResponse,
 		},
 	});
 });

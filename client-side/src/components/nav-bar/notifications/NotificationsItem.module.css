@@ -1,0 +1,34 @@
+.item {
+	position: relative;
+	width: 100%;
+	height: fit-content;
+	padding: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.item img {
+	margin-right: 10px;
+	width: 48px;
+	height: 48px;
+}
+
+.item h4 {
+	color: black;
+	font-size: 20px;
+}
+
+.icon {
+	margin: 0px 10px 0px 5px;
+	transition: transform 100ms;
+	cursor: pointer;
+}
+
+.icon:hover {
+	transform: scale(1.15);
+}
+
+.icon:active {
+	transform: scale(1);
+}

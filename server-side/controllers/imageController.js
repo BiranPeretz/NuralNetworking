@@ -58,7 +58,7 @@ exports.cloudinaryImageUpload = async function (req, res, next) {
 		} else {
 			cloudinaryOptionsObj = {
 				folder: "NeuralNetworking/image",
-				width: 800,
+				width: 570,
 				crop: "fit",
 				quality: "auto:good",
 				fetch_format: "auto",
@@ -84,73 +84,6 @@ exports.cloudinaryImageUpload = async function (req, res, next) {
 				data: { imageURL: result.url },
 			});
 		}
-
-		// //////////////////////////////////////////////
-		// upload(req, res, function (err) {
-		// 	if (err instanceof multer.MulterError) {
-		// 		return next(new AppError(`Multer error: ${err.message}`, 400));
-		// 	} else if (err) {
-		// 		return next(new AppError(`Upload error: ${err.message}`, 500));
-		// 	}
-
-		// 	if (
-		// 		!req.body.type ||
-		// 		(req.body.type !== "profilePicture" && req.body.type !== "postImage")
-		// 	) {
-		// 		return next(
-		// 			new AppError(
-		// 				`Invalid type, must be "profilePicture" or "postImage".`,
-		// 				400
-		// 			)
-		// 		);
-		// 	}
-
-		// 	let cloudinaryOptionsObj;
-
-		// 	if (req.body.type === "profilePicture") {
-		// 		cloudinaryOptionsObj = {
-		// 			folder: "NeuralNetworking/icon",
-		// 			width: 100,
-		// 			height: 100,
-		// 			crop: "fill",
-		// 			radius: "max",
-		// 		};
-		// 	} else {
-		// 		cloudinaryOptionsObj = {
-		// 			folder: "NeuralNetworking/image",
-		// 			width: 800,
-		// 			crop: "fit",
-		// 			quality: "auto:good",
-		// 			fetch_format: "auto",
-		// 		};
-		// 	}
-
-		// 	cloudinary.uploader.upload(
-		// 		req.file.path,
-		// 		cloudinaryOptionsObj,
-		// 		(cloudinaryErr, result) => {
-		// 			if (cloudinaryErr) {
-		// 				return next(
-		// 					new AppError(`Cloudinary error: ${cloudinaryErr.message}`, 500)
-		// 				);
-		// 			}
-
-		// 			fs.unlink(req.file.path, (fsErr) => {
-		// 				if (fsErr) {
-		// 					console.error(`Error deleting file: ${fsErr.message}`);
-		// 				}
-		// 			});
-		// 			if (req.isInternal) {
-		// 				return result;
-		// 			} else {
-		// 				res.status(200).json({
-		// 					message: "File uploaded successfully",
-		// 					imageUrl: result.url,
-		// 				});
-		// 			}
-		// 		}
-		// 	);
-		// });
 	} catch (error) {
 		console.log(error);
 		//if internal request throw the error to calling function

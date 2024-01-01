@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const filterObjProperties = require("../utils/filterObjProperties");
 const Post = require("../models/postModel");
 const { addComment } = require("./postController");
+const { createNotification } = require("./notificationController");
 
 //Create new comment
 exports.createComment = catchAsync(async function (req, res, next) {
@@ -31,12 +32,39 @@ exports.createComment = catchAsync(async function (req, res, next) {
 
 		updateResponse = await addComment(req, res, next);
 
+		//if added post comment try to create notification
+		let notificationResponse;
+		if (updateResponse.status === "success") {
+			try {
+				req.body.internalNotificationRequest = true;
+				//userID is the post author or creator, populated or not
+				req.body.userID =
+					updateResponse?.data?.post?.author?._id.toString() ||
+					updateResponse?.data?.post?.author.toString() ||
+					updateResponse?.data?.post?.creatorID?._id.toString() ||
+					updateResponse?.data?.post?.creatorID.toString();
+				req.body.notificationType = "comment";
+				req.body.initiatorType = "Post";
+				req.body.initiatorID =
+					updateResponse?.data?.post?._id?.toString() ||
+					updateResponse?.data?.post?.toString();
+				const results = await createNotification(req, res, next);
+				if (results.status === "success") {
+					notificationResponse = results;
+				}
+			} catch (error) {
+				console.log(error);
+				notificationResponse = error;
+			}
+		}
+
 		//send response
 		res.status(201).json({
 			status: "success",
 			data: {
 				comment,
 				post: updateResponse?.data?.post,
+				notificationResponse,
 			},
 		});
 	} catch (err) {
@@ -90,6 +118,25 @@ exports.createCommentReply = catchAsync(async function (req, res, next) {
 
 	const post = await Post.findById(comment.postID);
 
+	//try to create notification
+	let notificationResponse;
+	try {
+		req.body.internalNotificationRequest = true;
+		req.body.userID =
+			parentComment?.userID?._id?.toString() ||
+			parentComment?.userID?.toString();
+		req.body.notificationType = "comment";
+		req.body.initiatorType = "Comment";
+		req.body.initiatorID = parentComment?._id.toString();
+		const results = await createNotification(req, res, next);
+		if (results.status === "success") {
+			notificationResponse = results;
+		}
+	} catch (error) {
+		console.log(error);
+		notificationResponse = error;
+	}
+
 	//send response
 	res.status(201).json({
 		status: "success",
@@ -97,6 +144,7 @@ exports.createCommentReply = catchAsync(async function (req, res, next) {
 			comment,
 			parentComment,
 			post,
+			notificationResponse,
 		},
 	});
 });
@@ -129,6 +177,24 @@ exports.like = catchAsync(async function (req, res, next) {
 	//save updated comment
 	await comment.save();
 
+	//try to create notification
+	let notificationResponse;
+	try {
+		req.body.internalNotificationRequest = true;
+		req.body.userID =
+			comment?.userID?._id?.toString() || comment?.userID?.toString();
+		req.body.notificationType = "like";
+		req.body.initiatorType = "Comment";
+		req.body.initiatorID = comment?._id.toString();
+		const results = await createNotification(req, res, next);
+		if (results.status === "success") {
+			notificationResponse = results;
+		}
+	} catch (error) {
+		console.log(error);
+		notificationResponse = error;
+	}
+
 	//send updated likeList
 	res.status(200).json({
 		status: "success",
@@ -136,6 +202,7 @@ exports.like = catchAsync(async function (req, res, next) {
 			commentID: comment._id,
 			likeList: comment.likeList,
 			postID: comment.postID,
+			notificationResponse,
 		},
 	});
 });
