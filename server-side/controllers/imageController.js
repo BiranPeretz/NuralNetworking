@@ -50,8 +50,8 @@ exports.cloudinaryImageUpload = async function (req, res, next) {
 		if (req.body.type === "profilePicture") {
 			cloudinaryOptionsObj = {
 				folder: "NeuralNetworking/icon",
-				width: 100,
-				height: 100,
+				width: 48,
+				height: 48,
 				crop: "fill",
 				radius: "max",
 			};
@@ -59,7 +59,7 @@ exports.cloudinaryImageUpload = async function (req, res, next) {
 			cloudinaryOptionsObj = {
 				folder: "NeuralNetworking/image",
 				width: 570,
-				crop: "fit",
+				crop: "limit",
 				quality: "auto:good",
 				fetch_format: "auto",
 			};

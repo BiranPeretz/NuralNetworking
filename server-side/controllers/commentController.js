@@ -149,7 +149,6 @@ exports.createCommentReply = catchAsync(async function (req, res, next) {
 	});
 });
 
-//TODO: build general util like function and replace
 //Add like to comment by ID
 exports.like = catchAsync(async function (req, res, next) {
 	//fetch comment by request parameter id
@@ -158,7 +157,7 @@ exports.like = catchAsync(async function (req, res, next) {
 	if (!comment) {
 		return next(new AppError("Could not find any matching comment.", 404));
 	}
-	console.log(comment.likeList);
+
 	//check if user already liked this comment
 	if (
 		comment.likeList.some(
@@ -169,6 +168,7 @@ exports.like = catchAsync(async function (req, res, next) {
 			new AppError("Requesting user already liked this comment.", 400)
 		);
 	}
+
 	//add user to like list
 	comment.likeList.push({
 		user: req.user._id,
@@ -195,6 +195,8 @@ exports.like = catchAsync(async function (req, res, next) {
 		notificationResponse = error;
 	}
 
+	const post = await Post.findById(comment.postID);
+
 	//send updated likeList
 	res.status(200).json({
 		status: "success",
@@ -203,11 +205,11 @@ exports.like = catchAsync(async function (req, res, next) {
 			likeList: comment.likeList,
 			postID: comment.postID,
 			notificationResponse,
+			post,
 		},
 	});
 });
 
-//TODO: build general util unlike function and replace
 //Remove like from comment by ID
 exports.unlike = catchAsync(async function (req, res, next) {
 	//fetch comment by request parameter id
@@ -217,7 +219,6 @@ exports.unlike = catchAsync(async function (req, res, next) {
 	if (!comment) {
 		return next(new AppError("Could not find any matching comment.", 404));
 	}
-	console.log(comment.likeList);
 
 	//check if user liked the comment
 	if (
@@ -239,6 +240,8 @@ exports.unlike = catchAsync(async function (req, res, next) {
 		{ runValidators: true, new: true }
 	);
 
+	const post = await Post.findById(comment.postID);
+
 	//send updated likeList
 	res.status(200).json({
 		status: "success",
@@ -246,6 +249,7 @@ exports.unlike = catchAsync(async function (req, res, next) {
 			commentID: updatedComment._id,
 			likeList: updatedComment.likeList,
 			postID: updatedComment.postID,
+			post,
 		},
 	});
 });

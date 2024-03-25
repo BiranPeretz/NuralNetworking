@@ -174,7 +174,6 @@ exports.getAllUserRelatedPosts = catchAsync(async function (req, res, next) {
 	}
 });
 
-//TODO: build general util like function and replace
 //Add like to post by ID
 exports.like = catchAsync(async function (req, res, next) {
 	//fetch post by request parameter id
@@ -200,7 +199,6 @@ exports.like = catchAsync(async function (req, res, next) {
 	await post.save();
 
 	//try to create notification for post owner
-	//TODO: consider exporting to util/notification util function
 	let notificationResponse;
 	try {
 		req.body.internalNotificationRequest = true;
@@ -228,7 +226,6 @@ exports.like = catchAsync(async function (req, res, next) {
 	});
 });
 
-//TODO: build general util unlike function and replace
 //Remove like from post by ID
 exports.unlike = catchAsync(async function (req, res, next) {
 	//fetch post by request parameter id
@@ -238,7 +235,6 @@ exports.unlike = catchAsync(async function (req, res, next) {
 	if (!post) {
 		return next(new AppError("Could not find any matching post.", 404));
 	}
-	console.log(post.likeList);
 
 	//check if user liked the post
 	if (

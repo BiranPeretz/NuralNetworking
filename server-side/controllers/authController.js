@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
+const testSendEmail = require("../utils/testSendEmail");
 const sendEmail = require("../utils/sendEmail");
 const filterObjProperties = require("../utils/filterObjProperties");
 
@@ -18,6 +19,7 @@ const signToken = (id) => {
 //TODO: decide about cookie related code and if using or not
 const createSendToken = (user, statusCode, res) => {
 	const token = signToken(user._id);
+	console.log(`FROM CREATESENDTOKEN, JWT TOKEN:${token}`); //TODO: delete me
 	const cookieOptions = {
 		//Define token cookie properties
 		expires: new Date(
@@ -84,30 +86,36 @@ exports.login = catchAsync(async function (req, res, next) {
 //Create reset token for user who forgot hes password and send email
 exports.forgotPassword = catchAsync(async function (req, res, next) {
 	const email = req.body.email;
-	//get the user via requested id and check if user
+	//get the user via requested email and check if user
 	const user = await User.findOne({ email });
 	if (!user) {
 		return next(new AppError("There is no user with that email.", 404));
 	}
-	console.log(user);
+
+	if (!user.verifiedEmail) {
+		return next(
+			new AppError("Email must be varified to use this feature.", 403)
+		);
+	}
+
 	//create reset password token
 	const resetToken = user.createPasswordResetToken();
 	await user.save({ validateBeforeSave: false });
 
-	//send reset token to the user via email (if dummy/self created user)
-	const resetURL = `${req.protocol}://${req.get(
-		"host"
-	)}/users/resetPassword/${resetToken}`;
-
-	//TODO: 1)change name to app's name 2) change the message to html 3) use a button redirecting to password change page
-	const message = `Hey there from the Neural Networking app. Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+	const message = `A password reset request for your account was received. Please use the token provided below to proceed with resetting your password.<br><br>Token: <br><span>${resetToken}</span><br><br>Enter this token in the specified field along with your new password.`;
 
 	try {
-		await sendEmail({
-			email,
-			subject: "Your password reset token (valid for 10 min)",
+		sendEmail({
+			to: user.email,
+			header: "Password Reset Request",
 			message,
-		});
+		})
+			.then(() => {
+				console.log("Send email attempted.");
+			})
+			.catch((error) => {
+				console.error("Send email failed:", error);
+			});
 
 		res.status(200).json({
 			status: "success",
@@ -117,11 +125,11 @@ exports.forgotPassword = catchAsync(async function (req, res, next) {
 		user.passwordResetToken = undefined;
 		user.passwordResetExpires = undefined;
 		await user.save({ validateBeforeSave: false });
-
 		return next(
 			new AppError(
-				"There was an error sending email, please try again later.",
-				500
+				err?.message ||
+					"There was an error sending email, please try again later.",
+				err.statusCode || 500
 			)
 		);
 	}
@@ -142,7 +150,7 @@ exports.resetPassword = catchAsync(async function (req, res, next) {
 	//check if user
 	if (!user) {
 		return next(
-			new AppError("Invalid request or password reset time limit expired.", 400)
+			new AppError("Invalid token or token time limit expired.", 400)
 		);
 	}
 	console.log(user);
@@ -155,6 +163,82 @@ exports.resetPassword = catchAsync(async function (req, res, next) {
 	await user.save();
 	//log the user in and send auth token
 	createSendToken(user, 200, res);
+});
+
+//Create reset token for user who forgot hes password and send email
+exports.sendVerificationEmail = catchAsync(async function (req, res, next) {
+	const email = req.body.email;
+	//get the user via requested email and check if user
+	const user = await User.findOne({ email });
+	if (!user) {
+		return next(new AppError("There is no user with that email.", 404));
+	}
+
+	//create email verification token
+	const resetToken = user.createEmailVerificationToken();
+	await user.save({ validateBeforeSave: false });
+
+	const message = `A email verification request for your account was received. Please use the token provided below to proceed.<br><br>Token: <br><span>${resetToken}</span><br><br>Enter this token in the specified field.`;
+
+	try {
+		sendEmail({
+			to: user.email,
+			header: "Email Verification Request",
+			message,
+		})
+			.then(() => {
+				console.log("Send email attempted.");
+			})
+			.catch((error) => {
+				console.error("Send email failed:", error);
+			});
+
+		res.status(200).json({
+			status: "success",
+			message: "Email verification mail has been sent to your email inbox.",
+		});
+	} catch (err) {
+		user.emailVerificationToken = undefined;
+		user.verificationTokenExpires = undefined;
+		await user.save({ validateBeforeSave: false });
+		return next(
+			new AppError(
+				err?.message ||
+					"There was an error sending email, please try again later.",
+				err.statusCode || 500
+			)
+		);
+	}
+});
+
+//Verify user's email via verification token
+exports.verifyEmail = catchAsync(async function (req, res, next) {
+	//find user by verification token and its validety
+	const hashedToken = crypto
+		.createHash("sha256")
+		.update(req.params.token)
+		.digest("hex");
+
+	const user = await User.findOne({
+		emailVerificationToken: hashedToken,
+		verificationTokenExpires: { $gt: Date.now() },
+	});
+	//check if user
+	if (!user) {
+		return next(
+			new AppError("Invalid token or token time limit expired.", 400)
+		);
+	}
+	//update user's verification status
+	user.verifiedEmail = true;
+	user.emailVerificationToken = undefined;
+	user.verificationTokenExpires = undefined;
+	await user.save({ validateBeforeSave: false });
+
+	res.status(200).json({
+		status: "success",
+		message: "The email has been verified successfully.",
+	});
 });
 
 //General middleware to restrict some features for logged in users only

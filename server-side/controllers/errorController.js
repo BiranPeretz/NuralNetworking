@@ -5,9 +5,9 @@ const handleCastErrorDB = function (err) {
 	return new AppError(message, 400);
 };
 
-//The only uniqe parameter is email
 const handleDuplicateFieldsDB = function (err) {
-	const message = `This email is already taken, please use different email or login.`;
+	let field = Object.keys(err.keyPattern)[0];
+	let message = `This ${field} is already taken, Please choose a different ${field}.`;
 	return new AppError(message, 400);
 };
 

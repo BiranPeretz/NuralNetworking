@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 const userSchema = new mongoose.Schema({
 	fullName: {
 		type: String,
-		//TODO: add person full name validation
+		maxlength: [40, "Full name should not exceed 40 characters."],
 	},
 	password: {
 		type: String,
@@ -23,23 +23,30 @@ const userSchema = new mongoose.Schema({
 			validator: function (el) {
 				if (el && this.password) return el === this.password;
 			},
-			message: "Passwords are not the same!",
+			message: "Passwords are not the same",
 		},
 	},
 	email: {
 		type: String,
 		required: [true, "Please provide your email."],
-		unique: true,
+		unique: [
+			true,
+			"This email is taken, use different email or login instead.",
+		],
 		lowercase: true,
 		validate: [validator.isEmail, "Please provide a valid email."], //email validation with validator.js
 	},
 	profilePicture: {
 		type: String,
-		default: "https://randomuser.me/api/portraits/thumb/men/76.jpg", //TODO: change for real default
+		default: "",
 	},
 	about: {
 		type: String,
 		maxlength: [100, "about section should not exceed 100 characters."],
+	},
+	verifiedEmail: {
+		type: Boolean,
+		default: false,
 	},
 	friendsList: [
 		{
@@ -92,7 +99,9 @@ const userSchema = new mongoose.Schema({
 	],
 	passwordChangedAt: Date, //Last password change
 	passwordResetToken: String,
-	passwordResetExpires: Date, //Reset token expiration date
+	passwordResetExpires: Date, //Password reset token expiration date
+	emailVerificationToken: String,
+	verificationTokenExpires: Date, //Email verification token expiration date
 });
 
 userSchema.plugin(require("mongoose-autopopulate"));
@@ -158,6 +167,20 @@ userSchema.methods.createPasswordResetToken = function () {
 		.digest("hex");
 
 	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+	return resetToken;
+};
+
+//Create email verification token and set 24 hours expiration
+userSchema.methods.createEmailVerificationToken = function () {
+	const resetToken = crypto.randomBytes(32).toString("hex");
+
+	this.emailVerificationToken = crypto
+		.createHash("sha256")
+		.update(resetToken)
+		.digest("hex");
+
+	this.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
 
 	return resetToken;
 };

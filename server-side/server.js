@@ -3,8 +3,7 @@ const dotenv = require("dotenv");
 
 //Catch app-wide uncaught exceptions
 process.on("uncaughtException", (err) => {
-	console.log("Uncaught exception...");
-	console.log(err.name, err.message);
+	console.log("Uncaught exception: ", err.name, err.message);
 	process.exit(1);
 });
 

@@ -8,9 +8,13 @@ const router = express.Router();
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 
-//forgot password and reset
+//forgot and reset password
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
+
+//send and verify email
+router.post("/sendVerificationEmail", authController.sendVerificationEmail);
+router.patch("/verifyEmail/:token", authController.verifyEmail);
 
 //Restrict all routes defined after this line for logged in users only
 router.use(authController.protect);
@@ -23,9 +27,6 @@ router.get("/socialsList", userController.getSocialsList);
 
 //Create user profile
 router.patch("/createProfile", userController.createProfile);
-
-//Remove user's friend request
-// router.patch("/removeFriendRequest/:id", userController.removeFriendRequest);
 
 //Send friend request
 router.patch("/sendFriendRequest/:id", userController.sendFriendRequest);
@@ -44,6 +45,9 @@ router.patch("/removeListItem", userController.removeListItem);
 
 //Get user social suggestions (post because need to send data)
 router.post("/mySuggestions", userController.mySuggestions);
+
+//Search users by full name
+router.get("/searchUsers", userController.searchUsersByFullName);
 
 //Get all users
 router.get("/", userController.getAllUsers);

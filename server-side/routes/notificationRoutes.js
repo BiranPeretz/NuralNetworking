@@ -10,7 +10,7 @@ router.use(authController.protect);
 //Create new notification
 router.post("/createNotification", notificationController.createNotification);
 
-//Get all unread notifications of requesting user
+//Get notifications for requesting user
 router.get("/getMyNotifications", notificationController.getMyNotifications);
 
 //Mark all requesting user's notifications as read

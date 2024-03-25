@@ -10,6 +10,9 @@ router.use(authController.protect);
 //Get all groups
 router.get("/", groupController.getAllGroups);
 
+//Search groups by name
+router.get("/searchGroups", groupController.searchGroupsByName);
+
 //Create new group
 router.post("/createGroup", groupController.createGroup);
 

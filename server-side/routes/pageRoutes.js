@@ -10,6 +10,9 @@ router.use(authController.protect);
 //Get all pages
 router.get("/", pageController.getAllPages);
 
+//Search pages by full name
+router.get("/searchPages", pageController.searchPagesByName);
+
 //Get all pages owned by requesting user
 router.get("/getMyPages", pageController.getMyPages);
 

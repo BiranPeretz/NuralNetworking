@@ -4,11 +4,11 @@ const groupSchema = new mongoose.Schema({
 	name: {
 		type: String,
 		required: [true, "Please specify the group name."],
-		//TODO: add uniqe
+		unique: [true, "This group name is taken, please choose different name."],
 	},
 	profilePicture: {
 		type: String,
-		default: "https://randomuser.me/api/portraits/thumb/men/76.jpg", //TODO: change for real default
+		default: "",
 	},
 	description: {
 		type: String,

@@ -227,6 +227,11 @@ exports.markAsRead = catchAsync(async function (req, res, next) {
 		);
 	}
 
+	//check if notification is not read already
+	if (notification.isRead === true) {
+		return next(new AppError(`This notification has already read.`, 400));
+	}
+
 	//mark notification as read
 	notification.isRead = true;
 	await notification.save();

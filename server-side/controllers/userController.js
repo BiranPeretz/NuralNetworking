@@ -5,7 +5,7 @@ const filterObjProperties = require("../utils/filterObjProperties");
 const Group = require("../models/groupModel");
 const Page = require("../models/pageModel");
 const mongoose = require("mongoose");
-const CRUDOperations = require("./CRUDOperations");
+const { getAll, indexedTextSearch } = require("./CRUDOperations");
 const suggestionAgg = require("../utils/suggestionAgg");
 const getListAgg = require("../utils/getListAgg");
 const {
@@ -13,9 +13,10 @@ const {
 	cloudinaryImageUpload,
 } = require("./imageController");
 const { createNotification } = require("./notificationController");
+const { query } = require("express");
 
 //get all users
-exports.getAllUsers = CRUDOperations.getAll(User);
+exports.getAllUsers = getAll(User);
 
 //get user by id
 exports.getUserById = catchAsync(async function (req, res, next) {
@@ -60,11 +61,11 @@ exports.createProfile = catchAsync(async function (req, res, next) {
 	}
 	//store fullName and about to filter array
 	const filteredArray = ["fullName", "about"];
-	//add pofilePicture if included in the request
+	//add pofilePicture to filteredArray if included in the request
 	if (req.body.profilePicture) {
 		filteredArray.push("profilePicture");
 	}
-	//filter req.body to filtered array
+	//filter req.body by filteredArray
 	const filteredBody = filterObjProperties(req.body, ...filteredArray);
 
 	//upload image to cloudinary and store image url
@@ -392,7 +393,7 @@ exports.getSocialsList = catchAsync(async function (req, res, next) {
 		console.log(socials);
 
 		//filter data according to search value
-		if (req.query.searchString) {
+		if (req.query?.searchString) {
 			const itemPropName = listName.slice(0, -5);
 			socials = socials.filter((item) =>
 				item[itemPropName].name
@@ -667,6 +668,52 @@ exports.acceptFriendRequest = catchAsync(async function (req, res, next) {
 		return next(
 			new AppError(
 				`Error accepting friend request: ${err.message}`,
+				err.statusCode || 500
+			)
+		);
+	}
+});
+
+//Search users by string using text index
+exports.searchUsersByFullName = catchAsync(async function (req, res, next) {
+	try {
+		const { value, page, limit } = req?.query;
+		//check if valid value
+		if (typeof value !== "string") {
+			return next(new AppError("Please provide an valid string value.", 400));
+		}
+
+		//search users
+		const results = await indexedTextSearch(
+			User,
+			value,
+			parseInt(page, 10) || 1,
+			parseInt(limit, 10) || 5,
+			"_id fullName profilePicture"
+		);
+
+		//if return value is not an array throw an error
+		if (!Array.isArray(results?.results)) {
+			throw new AppError("An error occured during the search.");
+		}
+
+		//standardize fullName prop
+		results.results = results.results?.map((item) => {
+			const newItem = item.toObject();
+			newItem.name = item?.fullName;
+			delete newItem?.fullName;
+			return newItem;
+		});
+
+		//send response
+		res.status(200).json({
+			status: "success",
+			data: results,
+		});
+	} catch (err) {
+		return next(
+			new AppError(
+				`Error searching users: ${err.message}`,
 				err.statusCode || 500
 			)
 		);
