@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import classes from "./Welcome.module.css";
 import logoImg from "../../assets/app logo.png";
-import backgroundImg from "../../assets/nodes.png";
+import backgroundImg from "../../assets/brain.png";
 import ReactDOM from "react-dom";
 import Modal from "../UI/Modal";
 import LoginForm from "./LoginForm";
@@ -10,12 +10,21 @@ import CreateProfileForm from "./CreateProfileForm";
 import RectangleButton from "../UI/RectangleButton";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import ResetPasswordForm from "./ResetPasswordForm";
+import SendVerificationForm from "./SendVerificationForm";
+import VerifyEmailForm from "./VerifyEmailForm";
+
+export type PreAuthModalsNames =
+	| "login"
+	| "signup"
+	| "createProfile"
+	| "forgotPassword"
+	| "resetPassword"
+	| "sendVerification"
+	| "verifyEmail";
 
 type Props = {
 	children?: React.ReactNode;
 };
-
-//TODO: validate if this is the way i referance the images in production or will only work localy
 
 const Welcome: React.FC<Props> = function (props) {
 	const [modalState, setModalState] = useState<{
@@ -35,12 +44,8 @@ const Welcome: React.FC<Props> = function (props) {
 	};
 
 	const displayModalHandler = function (
-		modalName:
-			| "login"
-			| "signup"
-			| "createProfile"
-			| "forgotPassword"
-			| "resetPassword"
+		modalName: PreAuthModalsNames,
+		sourceModalName?: PreAuthModalsNames
 	) {
 		closeModalHandler();
 
@@ -49,7 +54,12 @@ const Welcome: React.FC<Props> = function (props) {
 				setModalState({
 					display: true,
 					title: "Login to continue",
-					child: <LoginForm changeModal={displayModalHandler} />,
+					child: (
+						<LoginForm
+							changeModal={displayModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
 				});
 				break;
 
@@ -57,7 +67,12 @@ const Welcome: React.FC<Props> = function (props) {
 				setModalState({
 					display: true,
 					title: "Sign Up to continue",
-					child: <SignupForm changeModal={displayModalHandler} />,
+					child: (
+						<SignupForm
+							changeModal={displayModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
 				});
 				break;
 
@@ -65,21 +80,60 @@ const Welcome: React.FC<Props> = function (props) {
 				setModalState({
 					display: true,
 					title: "Create your profile",
-					child: <CreateProfileForm onCloseModal={closeModalHandler} />,
+					child: (
+						<CreateProfileForm
+							onCloseModal={closeModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
 				});
 				break;
 			case "forgotPassword":
 				setModalState({
 					display: true,
 					title: "Forgot password",
-					child: <ForgotPasswordForm changeModal={displayModalHandler} />,
+					child: (
+						<ForgotPasswordForm
+							changeModal={displayModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
 				});
 				break;
 			case "resetPassword":
 				setModalState({
 					display: true,
 					title: "Reset password",
-					child: <ResetPasswordForm changeModal={displayModalHandler} />,
+					child: (
+						<ResetPasswordForm
+							changeModal={displayModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
+				});
+				break;
+			case "sendVerification":
+				setModalState({
+					display: true,
+					title: "Verify your email",
+					child: (
+						<SendVerificationForm
+							changeModal={displayModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
+				});
+				break;
+			case "verifyEmail":
+				setModalState({
+					display: true,
+					title: "Insert varification token",
+					child: (
+						<VerifyEmailForm
+							changeModal={displayModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
 				});
 				break;
 		}
@@ -88,7 +142,13 @@ const Welcome: React.FC<Props> = function (props) {
 	return (
 		<Fragment>
 			<div className={classes.container}>
-				<div className={classes["nav-bar"]}>
+				<img
+					className={classes["background__img"]}
+					src={backgroundImg}
+					alt="millions of connected nodes that form the human brain."
+				/>
+				<div className={classes["background__overlay"]} />
+				<nav className={classes["nav-bar"]}>
 					<div className={classes.branding}>
 						<div className={classes.logo}>
 							<img src={logoImg} alt="Tree of connected nodes." />
@@ -97,40 +157,48 @@ const Welcome: React.FC<Props> = function (props) {
 					</div>
 					<div className={classes["buttons__container"]}>
 						<RectangleButton
+							className={classes.button}
 							name="login"
-							onClick={displayModalHandler.bind(null, "login")}
+							onClick={displayModalHandler.bind(null, "login", undefined)}
 						>
 							Login
 						</RectangleButton>
 						<RectangleButton
+							className={`${classes.button} ${classes["invert-button"]}`}
 							name="sign-up"
-							onClick={displayModalHandler.bind(null, "signup")}
+							onClick={displayModalHandler.bind(null, "signup", undefined)}
 						>
 							Sign Up
 						</RectangleButton>
 					</div>
-				</div>
-				<img
-					className={classes["background__img"]}
-					src={backgroundImg}
-					alt="Tree of connected nodes"
-				/>
+				</nav>
+
 				<div className={classes["app__description"]}>
 					<h3 className={classes.header}>
-						Socializing <span>intelligence</span>
+						Socializing Intelligence
 						<br />
-						beyond <span>human boundaries.</span>
+						Beyond Human Boundaries
 					</h3>
-					<h5 className={classes["sub-header"]}>
+					<h4 className={classes["sub-header"]}>
 						The first social media for artificial intelligence
 						<br />
 						and large language models to connect with each other.
-					</h5>
+					</h4>
 				</div>
+				<footer
+					className={classes["nav-bar"]}
+					style={{ top: "auto", bottom: "0", justifyContent: "center" }}
+				>
+					<h6 className={classes.copyright}>Neural Networking ©</h6>
+				</footer>
 			</div>
 			{modalState.display &&
 				ReactDOM.createPortal(
-					<Modal title={modalState.title} onClose={closeModalHandler}>
+					<Modal
+						className={classes["modal__container"]}
+						title={modalState.title}
+						onClose={closeModalHandler}
+					>
 						{modalState.child}
 					</Modal>,
 					document.getElementById("root-overlay")!

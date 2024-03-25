@@ -1,108 +1,141 @@
-import React, { useRef } from "react";
+import React from "react";
 import classes from "./Forms.module.css";
-import { Form, useNavigate } from "react-router-dom";
+import { Form } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
 import userType from "../../types/user";
 import { authenticateUser } from "../../store/userSlice";
 import LabledInput from "../UI/LabledInput";
+import { loginSchema } from "./LoginForm";
+import { PreAuthModalsNames } from "./Welcome";
 
 type Props = {
 	changeModal: (
-		modalName:
-			| "login"
-			| "signup"
-			| "createProfile"
-			| "forgotPassword"
-			| "resetPassword"
+		modalName: PreAuthModalsNames,
+		sourceModalName?: PreAuthModalsNames
 	) => void;
+	originModalName?: PreAuthModalsNames;
 };
 
-//TODO: refactor to combine with other forms?
+export const signupSchema = loginSchema.extend({
+	passwordConfirm: z
+		.string()
+		.min(1, { message: "Password confirmation is required." })
+		.min(8, {
+			message: "Password confirmation must contain least 8 characters.",
+		})
+		.max(40, {
+			message: "Password confirmation can not exceed 40 characters.",
+		}),
+});
+
+type FormFields = z.infer<typeof signupSchema>;
+
 const SignupForm: React.FC<Props> = function (props) {
-	const navigate = useNavigate();
+	const {
+		register,
+		handleSubmit,
+		setError,
+		formState: { errors, isSubmitting },
+	} = useForm<FormFields>({
+		resolver: zodResolver(signupSchema),
+	});
+
 	const dispatch = useDispatch();
 
-	//email and password input references
-	const emailRef = useRef<HTMLInputElement>(null);
-	const passwordRef = useRef<HTMLInputElement>(null);
-	const passwordConfirmRef = useRef<HTMLInputElement>(null);
-
-	const submitFormHandler = async function (event: React.FormEvent) {
-		event.preventDefault();
+	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
-			if (
-				!emailRef.current!.value ||
-				!passwordRef.current!.value ||
-				!passwordConfirmRef.current!.value
-			) {
-				//TODO: handle/dispaly one of the inputs is missing to the user
-				return;
+			if (!(data?.password === data?.passwordConfirm)) {
+				throw new Error("Password confirmation does not match password.");
 			}
 
-			const bodyObj = {
-				email: emailRef.current!.value,
-				password: passwordRef.current!.value,
-				passwordConfirm: passwordConfirmRef.current!.value,
-			};
-			const res = await fetch(
+			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + "users/signup",
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(bodyObj),
+					body: JSON.stringify(data),
 				}
 			);
-			const data = await res?.json();
-			if (!res?.ok) {
-				console.log(data.message);
-				//TODO: handle the errors sent by the server and leave the message logging/displaing to the catch block
-				return;
+
+			const resultData = await result?.json();
+
+			if (!(resultData?.status === "success")) {
+				throw new Error(resultData.message);
 			}
 
-			console.log(data);
-
 			//store JWT token in local storage
-			localStorage.setItem("token", data.token);
+			localStorage.setItem("token", resultData?.token);
 
 			const user: userType = {
-				_id: data.data.user._id,
-				email: data.data.user.email,
-				friendsList: data.data.user.friendsList,
-				groupsList: data.data.user.groupsList,
-				pagesList: data.data.user.pagesList,
+				_id: resultData?.data?.user?._id,
+				email: resultData?.data?.user?.email,
+				friendsList: [],
+				groupsList: [],
+				pagesList: [],
 				friendRequestsList: [],
 			};
 
 			dispatch(authenticateUser(user));
-			props.changeModal("createProfile");
-		} catch (err) {
-			console.log(err);
+			props.changeModal("sendVerification", "signup");
+		} catch (error) {
+			setError("root", {
+				message: (error as Error)?.message || "Error signing up.",
+			});
 		}
 	};
+
 	return (
-		<Form method="post" className={classes.form} onSubmit={submitFormHandler}>
+		<Form
+			method="post"
+			className={classes.form}
+			onSubmit={handleSubmit(onSubmit)}
+		>
+			{errors?.root && (
+				<span style={{ fontSize: "1rem", color: "red" }}>
+					{errors?.root?.message}
+				</span>
+			)}
 			<LabledInput
+				{...register("email")}
 				type="text"
 				name="email"
-				placeholder="Enter email"
-				ref={emailRef}
+				placeholder="Email address"
+				error={errors?.email?.message}
 			/>
 			<LabledInput
+				{...register("password")}
 				type="password"
 				name="password"
-				placeholder="Enter password"
-				ref={passwordRef}
+				placeholder="Password"
+				error={errors?.password?.message}
 			/>
 			<LabledInput
+				{...register("passwordConfirm")}
 				type="password"
-				name="Confirm"
+				name="passwordConfirm"
 				placeholder="Confirm password"
-				ref={passwordConfirmRef}
+				error={errors?.passwordConfirm?.message}
 			/>
-			<button type="submit">Submit!</button>
-			<h6>
+			<button
+				disabled={isSubmitting}
+				className={`${classes.submit} ${
+					isSubmitting && classes["disabled-button"]
+				}`}
+				type="submit"
+			>
+				<h2 className={classes["submit__text"]}>Continue</h2>
+			</button>
+			<h6 className={classes.text}>
 				Already have an account?{" "}
-				<span onClick={props.changeModal.bind(null, "login")}>Login</span>
+				<span
+					className={classes["text-button"]}
+					onClick={props.changeModal.bind(null, "login", "signup")}
+				>
+					Login
+				</span>
 			</h6>
 		</Form>
 	);

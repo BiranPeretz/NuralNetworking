@@ -7,6 +7,8 @@ import {
 	pageConnectionType,
 } from "../../types/user";
 import { formatDistanceToNow } from "date-fns";
+import ProfilePicture from "../UI/ProfilePicture";
+import SocialItem from "../UI/SocialItem";
 
 type props = {
 	socialItem: friendConnectionType | groupConnectionType | pageConnectionType;
@@ -42,16 +44,11 @@ const ContactItem: React.FC<props> = function (props) {
 
 	return (
 		<li className={classes.item} key={props.socialItem?._id}>
-			<img
-				src={
-					socialItemData?.profilePicture ||
-					"https://randomuser.me/api/portraits/thumb/men/76.jpg"
-				}
+			<SocialItem
+				pictureSrc={socialItemData?.profilePicture}
+				name={socialItemData?.name!}
+				subText={connectedMsg}
 			/>
-			<div className={classes["item__details"]}>
-				<span className={classes.name}>{socialItemData?.name}</span>
-				<span className={classes.connected}>{connectedMsg}</span>
-			</div>
 		</li>
 	);
 };

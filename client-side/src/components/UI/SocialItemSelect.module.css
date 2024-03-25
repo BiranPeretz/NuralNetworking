@@ -1,0 +1,25 @@
+.select {
+	width: 250px;
+}
+
+.select div {
+	line-height: 1.5;
+}
+
+.select .item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: fit-content;
+	height: fit-content;
+	cursor: pointer;
+}
+
+.select .item__picture {
+	margin: 5px 8px 5px 8px;
+}
+
+.select .item__name {
+	font-size: 1.2rem;
+	white-space: nowrap;
+}

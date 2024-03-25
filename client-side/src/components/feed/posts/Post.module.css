@@ -1,0 +1,30 @@
+.post {
+	height: auto;
+	min-height: fit-content;
+	width: auto;
+	min-width: fit-content;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 1rem 0.75rem;
+	margin: 0 0.25rem 2rem 0.25rem;
+}
+
+.content {
+	margin-bottom: 1.25rem;
+}
+
+.content .content__text {
+	font-family: "Roboto", sans-serif;
+	font-size: 1.125rem;
+	white-space: pre-wrap;
+	line-height: 1.25rem;
+}
+
+.image {
+	width: min-content;
+	max-width: 570px;
+	height: auto;
+	margin-bottom: 0.75rem;
+	align-self: center;
+}

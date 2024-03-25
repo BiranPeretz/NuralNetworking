@@ -1,15 +1,16 @@
-import React, { Fragment } from "react";
+import React, { CSSProperties, Fragment } from "react";
 import ReactDOM from "react-dom";
 import classes from "./Modal.module.css";
 import Card from "./Card";
 import Backdrop from "./Backdrop";
-import { AiOutlineClose } from "react-icons/ai";
+import CloseX from "../../assets/icons/CloseX";
 
 type Props = {
 	className?: string;
 	backdropClassName?: string;
 	children?: React.ReactNode;
 	title?: string;
+	style?: CSSProperties;
 	onClose: () => void;
 };
 
@@ -24,6 +25,7 @@ const Modal: React.FC<Props> = function (props) {
 				document.getElementById("root-overlay")!
 			)}
 			<Card
+				style={props.style}
 				className={
 					props.className
 						? `${classes.modal} ${props.className}`
@@ -31,17 +33,16 @@ const Modal: React.FC<Props> = function (props) {
 				}
 			>
 				{props.title ? (
-					<div className={classes["modal__title"]}>
-						<h2>{props.title}</h2>
+					<div className={classes["title__container"]}>
+						<h2 className={classes.title}>{props.title}</h2>
 					</div>
 				) : undefined}
 
-				<AiOutlineClose
+				<CloseX
 					className={classes["close-button"]}
-					size="1.4rem"
 					onClick={props.onClose}
-				></AiOutlineClose>
-				<div className={classes["modal__body"]}>{props.children}</div>
+				></CloseX>
+				{props.children}
 			</Card>
 		</Fragment>
 	);

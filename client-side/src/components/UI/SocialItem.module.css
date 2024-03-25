@@ -1,0 +1,32 @@
+.text-container {
+	flex-grow: 1;
+	height: 100%;
+	min-height: 2.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	margin-left: 0.5rem;
+	overflow: hidden;
+}
+
+.name {
+	color: black;
+	font-size: 1.25rem;
+}
+
+.name.no-sub-text {
+	max-height: 1.5rem;
+}
+
+.sub-text {
+	color: #a5a5ad;
+	font-size: 0.875rem;
+}
+
+.name,
+.sub-text {
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

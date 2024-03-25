@@ -1,5 +1,3 @@
-import groupType from "./group";
-import pageType from "./page";
 import socialItemType from "./socialItem";
 
 export type friendConnectionType = {
@@ -32,6 +30,7 @@ type userType = {
 	fullName?: string;
 	profilePicture?: string;
 	about?: string;
+	verifiedEmail?: boolean;
 	friendsList: friendConnectionType[];
 	groupsList: groupConnectionType[];
 	pagesList: pageConnectionType[];

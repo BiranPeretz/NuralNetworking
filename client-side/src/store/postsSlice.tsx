@@ -59,6 +59,7 @@ const postsSlice = createSlice({
 		) {
 			state.posts.unshift(action.payload.post);
 			state.isLoading = false;
+			state.error = null;
 		},
 		fetchPostsFail: function (state, action: PayloadAction<Error>) {
 			state.isLoading = false;
@@ -70,10 +71,14 @@ const postsSlice = createSlice({
 				postID: string;
 				likeList: likeType[];
 				commentID?: string;
+				postCommentsSection?: commentType[];
 			}>
 		) {
 			state.posts.find((post) => {
 				if (post._id === action.payload.postID) {
+					if (action.payload.postCommentsSection) {
+						post.commentsList = action.payload.postCommentsSection;
+					}
 					if (action.payload.commentID) {
 						post.commentsList.find((comment) => {
 							if (comment._id === action.payload.commentID) {

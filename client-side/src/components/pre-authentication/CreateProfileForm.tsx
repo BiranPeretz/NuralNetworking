@@ -1,6 +1,9 @@
-import React, { useRef, useState, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import classes from "./Forms.module.css";
 import { Form, useNavigate } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { createProfile } from "../../store/userSlice";
 import { RootState } from "../../store/store";
@@ -8,30 +11,51 @@ import LabledInput from "../UI/LabledInput";
 import getToken from "../../util/getToken";
 import useLogout from "../../custom-hooks/useLogout";
 import FileUpload from "../UI/FileUpload";
-import ReactDOM from "react-dom";
-import Modal from "../UI/Modal";
-import { IoMdCheckmark } from "react-icons/io";
 import createProfileFormClasses from "./CreateProfileForm.module.css";
+import ImageUpload from "../../assets/icons/ImageUpload";
+import ImageSuccess from "../../assets/icons/ImageSuccess";
+import { PreAuthModalsNames } from "./Welcome";
 
 type Props = {
 	onCloseModal: () => void;
+	originModalName?: PreAuthModalsNames;
 };
 
-//TODO: refactor to combine with other forms?
+const createProfileSchema = z.object({
+	fullName: z
+		.string()
+		.min(1, { message: "Full name is required." })
+		.max(40, { message: "Full name can not exceed 40 characters." })
+		.regex(/^[A-Za-z ]+$/, {
+			message:
+				"Full name can only contain alphabetic characters divided by space.",
+		}),
+	about: z
+		.string()
+		.max(100, { message: "About description can not exceed 100 characters." })
+		.optional(),
+});
+
+type FormFields = z.infer<typeof createProfileSchema>;
+
 const CreateProfileForm: React.FC<Props> = function (props) {
+	const {
+		register,
+		handleSubmit,
+		setError,
+		formState: { errors, isSubmitting },
+	} = useForm<FormFields>({
+		resolver: zodResolver(createProfileSchema),
+	});
+
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const logout = useLogout();
 	const { email } = useSelector((state: RootState) => state.user);
 	const token = getToken();
-
 	const [displayFileUploader, setDisplayFileUploader] =
 		useState<boolean>(false);
 	const [imageFile, setImageFile] = useState<any>();
-
-	const fullNameRef = useRef<HTMLInputElement>(null);
-	const profilePictureRef = useRef<HTMLInputElement>(null);
-	const aboutRef = useRef<HTMLInputElement>(null);
 
 	const hideFileUploader = function () {
 		setDisplayFileUploader(false);
@@ -47,25 +71,19 @@ const CreateProfileForm: React.FC<Props> = function (props) {
 		logout();
 	};
 
-	const submitFormHandler = async function (event: React.FormEvent) {
-		event.preventDefault();
+	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
-			if (!fullNameRef.current!.value) {
-				//TODO: handle/dispaly full name is missing to the user
-				return;
-			}
-
 			const formData = new FormData();
 
-			formData.append("fullName", fullNameRef.current!.value);
-			if (aboutRef?.current?.value) {
-				formData.append("about", aboutRef.current!.value);
+			formData.append("fullName", data?.fullName);
+			if (data?.about) {
+				formData.append("about", data?.about);
 			}
 			if (imageFile) {
 				formData.append("image", imageFile);
 			}
 
-			const res = await fetch(
+			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + "users/CreateProfile",
 				{
 					method: "PATCH",
@@ -75,92 +93,95 @@ const CreateProfileForm: React.FC<Props> = function (props) {
 					body: formData,
 				}
 			);
-			console.log(res.body);
 
-			const data = await res?.json();
-			if (!res?.ok) {
-				console.log(data);
-				//TODO: handle the errors sent by the server and leave the message logging/displaing to the catch block
-				return;
+			const resultData = await result?.json();
+
+			if (!(resultData?.status === "success")) {
+				throw new Error(resultData.message);
 			}
 
-			dispatch(createProfile(data.data.user));
+			dispatch(createProfile(resultData.data.user));
 			navigate("/feed");
-		} catch (err) {
-			console.log(err);
+		} catch (error) {
+			setError("root", {
+				message: (error as Error)?.message || "Error creating profile.",
+			});
 		}
 	};
 
 	return (
 		<Fragment>
-			<Form className={classes.form} onSubmit={submitFormHandler}>
+			<Form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
+				{errors?.root && (
+					<span style={{ fontSize: "1rem", color: "red" }}>
+						{errors?.root?.message}
+					</span>
+				)}
 				<LabledInput
+					{...register("fullName")}
 					type="text"
-					name="Name"
+					name="fullName"
 					placeholder="Enter your full name"
-					ref={fullNameRef}
+					error={errors?.fullName?.message}
 				/>
 				<LabledInput
+					{...register("about")}
 					type="text"
 					name="about"
-					placeholder="Tell us about yourself (optional)"
-					ref={aboutRef}
+					placeholder="Tell us about yourself"
+					error={errors?.about?.message}
 				/>
-				<div className={createProfileFormClasses["upload-file-container"]}>
+				<div className={createProfileFormClasses["picture__container"]}>
+					<h3 className={createProfileFormClasses["picture__text"]}>
+						Add profile picture
+					</h3>
+
 					{imageFile ? (
-						<Fragment>
-							<h3>File successfully uploaded!</h3>
-							<button
-								type="button"
-								name="change-file"
-								style={{ backgroundColor: "lightgreen" }}
-								onClick={showFileUploader}
-							>
-								Change file
-							</button>
-						</Fragment>
+						<ImageSuccess
+							className={createProfileFormClasses.icon}
+							onClick={showFileUploader}
+						/>
 					) : (
-						<Fragment>
-							<h3>Profile picture</h3>
-							<button
-								type="button"
-								name="upload-file"
-								onClick={showFileUploader}
-							>
-								Upload file
-							</button>
-						</Fragment>
+						<ImageUpload
+							className={createProfileFormClasses.icon}
+							onClick={showFileUploader}
+						/>
 					)}
 				</div>
-
-				<h6>
-					Creating profile for{" "}
+				<button
+					disabled={isSubmitting}
+					className={`${classes.submit} ${
+						isSubmitting && classes["disabled-button"]
+					}`}
+					type="submit"
+				>
+					<h2 className={classes["submit__text"]}>Create profile</h2>
+				</button>
+				<h6 className={classes.text}>
+					Creating profile for
 					<strong
 						style={{
 							textDecoration: "underline",
 							textUnderlineOffset: "2px",
+							marginLeft: "0.25rem",
 						}}
 					>
 						{email}
 					</strong>
-					. <span onClick={notMeHandler}>Not me</span>
-				</h6>
-				<button type="submit">Create profile!</button>
-			</Form>
-			{displayFileUploader &&
-				ReactDOM.createPortal(
-					<Modal
-						title="Upload your image"
-						onClose={hideFileUploader}
-						className={createProfileFormClasses["file-uploader__modal"]}
-						backdropClassName={
-							createProfileFormClasses["file-uploader__backdrop"]
-						}
+					<span
+						className={classes["text-button"]}
+						style={{ marginLeft: "0.375rem" }}
+						onClick={notMeHandler}
 					>
-						<FileUpload setFile={setImageFile} />
-					</Modal>,
-					document.getElementById("root-overlay")!
-				)}
+						Not me
+					</span>
+				</h6>
+			</Form>
+			<FileUpload
+				setFile={setImageFile}
+				displayFileUploader={displayFileUploader}
+				onModalClose={hideFileUploader}
+			/>
 		</Fragment>
 	);
 };

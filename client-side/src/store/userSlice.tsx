@@ -27,11 +27,6 @@ export const userSlice = createSlice({
 			const { _id, email } = action.payload;
 			const token = getToken();
 			if (!_id || !token || !email) {
-				//Error authenticating the user.
-				console.log(
-					"Tried to authenticate user but id, token or email was falsy."
-				);
-				//TODO: Create some custom error handling to display a message to the user and rediret him to login/signup page here or anywhere else
 				return state;
 			}
 
@@ -41,6 +36,7 @@ export const userSlice = createSlice({
 			state.fullName = action.payload.fullName;
 			state.profilePicture = action.payload.profilePicture;
 			state.about = action.payload.about;
+			state.verifiedEmail = action.payload.verifiedEmail;
 		},
 		addFriends: function (
 			state,

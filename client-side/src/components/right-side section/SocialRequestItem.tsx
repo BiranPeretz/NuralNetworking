@@ -9,6 +9,7 @@ import {
 	rejectFriendRequest,
 } from "../../store/userThunks";
 import getToken from "../../util/getToken";
+import ProfilePicture from "../UI/ProfilePicture";
 
 type Props = {
 	requestingUser: socialItemType;
@@ -29,18 +30,30 @@ const SocialRequestItem: React.FC<Props> = function (props) {
 
 	return (
 		<Card className={classes.request}>
-			<div className={classes.message}>
-				<img src={props.requestingUser.profilePicture} />
-				<h5>
+			<div className={classes.content}>
+				<ProfilePicture
+					src={props.requestingUser.profilePicture}
+					ignoreDefaultSrc={true}
+				/>
+				<h4 className={classes.message}>
 					<span className={classes.name}>{props.requestingUser.name}</span> sent
+					<br />
 					you a friend request.
-				</h5>
+				</h4>
 			</div>
 			<div className={classes.buttons}>
-				<button name="Accept" onClick={acceptRequestHandler}>
+				<button
+					className={classes.accept}
+					name="Accept"
+					onClick={acceptRequestHandler}
+				>
 					Accept
 				</button>
-				<button name="Decline" onClick={declineRequestHandler}>
+				<button
+					className={classes.decline}
+					name="Decline"
+					onClick={declineRequestHandler}
+				>
 					Decline
 				</button>
 			</div>

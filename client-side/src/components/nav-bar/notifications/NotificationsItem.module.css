@@ -1,28 +1,33 @@
 .item {
-	position: relative;
 	width: 100%;
-	height: fit-content;
-	padding: 5px;
+	height: min-content;
+	padding: 0.625rem 1.25rem;
 	display: flex;
 	align-items: center;
-	justify-content: flex-start;
+	border-top: 1px solid #e1e3e7;
 }
 
-.item img {
-	margin-right: 10px;
-	width: 48px;
-	height: 48px;
+.item.read {
+	background-color: #f2f2f2;
 }
 
-.item h4 {
-	color: black;
-	font-size: 20px;
+.image {
+	margin-right: 1rem;
+}
+
+.message {
+	font-size: 1rem;
+	letter-spacing: 0.01rem;
+	line-height: 1.3rem;
+}
+
+.message .name {
+	font-weight: 600;
 }
 
 .icon {
-	margin: 0px 10px 0px 5px;
+	margin-left: 2rem;
 	transition: transform 100ms;
-	cursor: pointer;
 }
 
 .icon:hover {

@@ -4,6 +4,8 @@ import {
 	fetchNotificationsStart,
 	fetchNotificationsSuccess,
 	fetchNotificationsFail,
+	setReadNotification,
+	setReadAllNotification,
 } from "./notificationsSlice";
 
 export const fetchNotifications = function (
@@ -33,7 +35,7 @@ export const fetchNotifications = function (
 			const data = await response.json();
 			console.log(response);
 			console.log(data);
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 
@@ -82,12 +84,12 @@ export const readNotification = function (
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
+			dispatch(setReadNotification({ _id: notificationID }));
 		} catch (error) {
 			console.error(error);
-			//TODO: handle error
 		}
 	};
 };
@@ -105,15 +107,12 @@ export const readAllNotification = function (token: string) {
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
-
-			dispatch(clearNotificationsData());
-			dispatch(fetchNotifications(token, false));
+			dispatch(setReadAllNotification());
 		} catch (error) {
 			console.error(error);
-			//TODO: handle error
 		}
 	};
 };

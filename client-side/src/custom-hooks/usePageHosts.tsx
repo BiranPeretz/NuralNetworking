@@ -27,7 +27,7 @@ export function usePageHosts() {
 					);
 
 					const data = await response.json();
-					if (!response.ok) {
+					if (!(data?.status === "success")) {
 						throw new Error(`client-error:${data.message}`);
 					}
 

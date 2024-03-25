@@ -1,4 +1,4 @@
-import React, { useRef, Fragment, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import classes from "./Contacts.module.css";
 import ContactItem from "./ContactItem";
 import { useSelector } from "react-redux";
@@ -9,6 +9,8 @@ import {
 	groupConnectionType,
 	pageConnectionType,
 } from "../../types/user";
+import SimpleBar from "simplebar-react";
+import "simplebar-react/dist/simplebar.min.css";
 
 type Props = { displayList: "friendsList" | "groupsList" | "pagesList" };
 
@@ -19,6 +21,10 @@ const Contacts: React.FC<Props> = function (props) {
 	const [list, setList] = useState<
 		(friendConnectionType | groupConnectionType | pageConnectionType)[] | null
 	>(null);
+
+	useEffect(() => {
+		searchChangeHandler();
+	}, [props.displayList]);
 
 	const socialType: "friend" | "group" | "page" = props.displayList.slice(
 		0,
@@ -32,7 +38,6 @@ const Contacts: React.FC<Props> = function (props) {
 
 		if (searchRef?.current?.value) {
 			timerRef.current = setTimeout(() => {
-				console.log(searchRef?.current?.value);
 				if (Array.isArray(userSlice[props.displayList])) {
 					setList(
 						userSlice[props.displayList].filter((item: any) =>
@@ -42,37 +47,44 @@ const Contacts: React.FC<Props> = function (props) {
 						)
 					);
 				}
-			}, 800);
+			}, 500);
 		} else {
-			setList(userSlice[props.displayList]);
+			setList(null);
 		}
 	};
 
 	return (
-		<Fragment>
+		<div className={classes.container}>
 			<SearchInput
-				className={classes["search-input__container"]}
-				inputClassName={classes["search-input__input"]}
+				className={classes.search}
 				inputType="text"
 				inputName="local-search"
-				placeholder="Search My Socials"
-				iconSize="25px"
+				placeholder="Search my socials"
 				onInputChange={searchChangeHandler}
-				// onIconClick={searchClickHandler}  //TODO: add immidiate search execution on click?
 				ref={searchRef}
 			/>
 			<div className={classes.contacts}>
-				<ul className={classes["contacts__list"]}>
-					{(list || userSlice[props.displayList]).map((item) => (
-						<ContactItem
-							key={item?._id}
-							socialItem={item}
-							socialType={socialType}
-						/>
-					))}
-				</ul>
+				<h2 className={classes["contacts__type"]}>
+					{("my " + (socialType || "CONTACT") + "s").toUpperCase()}
+				</h2>
+				{(list && list?.length > 0) ||
+				userSlice[props.displayList].length > 0 ? (
+					<SimpleBar style={{ maxHeight: "calc(100% - 1.5rem)" }}>
+						<ul className={classes["contacts__list"]}>
+							{(list || userSlice[props.displayList]).map((item) => (
+								<ContactItem
+									key={item?._id}
+									socialItem={item}
+									socialType={socialType}
+								/>
+							))}
+						</ul>
+					</SimpleBar>
+				) : (
+					<h4 className={classes["no-contacts"]}>{`No ${socialType}s yet.`}</h4>
+				)}
 			</div>
-		</Fragment>
+		</div>
 	);
 };
 

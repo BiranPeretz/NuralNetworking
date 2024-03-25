@@ -1,22 +1,27 @@
-.upload-file-container {
+.picture__container {
+	width: 100%;
+	height: fit-content;
 	display: flex;
-	/* justify-content: space-between; */
+	justify-content: space-between;
 	align-items: center;
 }
 
-.upload-file-container button {
-	width: fit-content;
-	height: fit-content;
-	padding: 5px 10px 5px 10px;
-	border-radius: 25px;
-	margin-left: 10px;
-	background-color: rgb(210, 210, 210);
+.picture__text {
+	margin-left: 0.75rem;
+	color: #b7b7b7;
+	font-size: 1rem;
+	white-space: nowrap;
 }
 
-.file-uploader__modal {
-	z-index: 50;
+.picture__container .icon {
+	transition: transform 100ms;
+	cursor: pointer;
 }
 
-.file-uploader__backdrop {
-	z-index: 40;
+.picture__container .icon:hover {
+	transform: scale(1.15);
+}
+
+.picture__container .icon:active {
+	transform: scale(1);
 }

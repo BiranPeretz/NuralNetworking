@@ -1,0 +1,42 @@
+.container {
+	height: min-content;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	margin-top: 0.625rem;
+	margin-bottom: 2.5rem;
+}
+
+.user-picture {
+	margin-right: 0.75rem;
+}
+
+.input__container {
+	height: 3rem;
+	width: 100%;
+	min-width: min-content;
+	border: 1px solid rgba(0, 0, 0, 0.8);
+	border-radius: 3.125rem;
+	display: flex;
+	align-items: center;
+}
+
+.input__container input {
+	border: none;
+	height: fit-content;
+	width: 100%;
+	background-color: transparent;
+	padding-left: 1rem;
+	font-size: 1.125rem;
+}
+.input__container input::placeholder {
+	font-size: 1rem;
+}
+.input__container input:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+.icon {
+	margin: 0 0.75rem;
+}

@@ -1,0 +1,17 @@
+.container {
+	width: 100%;
+	min-width: min-content;
+	height: min-content;
+	display: flex;
+	align-items: center;
+}
+
+.icon__add {
+	margin-left: auto;
+
+	transition: transform 150ms;
+}
+
+.icon__add:hover {
+	transform: scale(1.2) rotate(90deg);
+}

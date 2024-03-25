@@ -52,51 +52,66 @@ const SocialSuggestions: React.FC<Props> = function (props) {
 	};
 
 	const noItemsMessageEL = (
-		<h5 className={classes["no-items-msg"]}>
+		<h4 className={classes["no-items-msg"]}>
 			No items to suggest at this moment.
-		</h5>
+		</h4>
 	);
 
 	return (
 		<div className={classes.suggestions}>
 			<Card className={classes["list-container"]}>
-				<h3>People you might know</h3>
-				<ul>
-					{friends?.suggestionItems?.map((item) => (
-						<SocialSuggestionItem
-							key={item._id}
-							suggestionItem={item}
-							suggestionType="friend"
-							addItem={handleAddSuggestionItem}
-						/>
-					)) || noItemsMessageEL}
-				</ul>
+				<h3 className={classes["list-header"]}>People you might know</h3>
+				{friends?.numOfResults ? (
+					<ul>
+						{friends?.suggestionItems?.map((item) => (
+							<SocialSuggestionItem
+								key={item._id}
+								suggestionItem={item}
+								suggestionType="friend"
+								addItem={handleAddSuggestionItem}
+							/>
+						))}
+					</ul>
+				) : (
+					<h4 className={classes["no-items-msg"]}>No people to suggest.</h4>
+				)}
 			</Card>
 			<Card className={classes["list-container"]}>
-				<h3>Top communities</h3>
-				<ul>
-					{groups?.suggestionItems?.map((item) => (
-						<SocialSuggestionItem
-							key={item._id}
-							suggestionItem={item}
-							suggestionType="group"
-							addItem={handleAddSuggestionItem}
-						/>
-					)) || noItemsMessageEL}
-				</ul>
+				<h3 className={classes["list-header"]}>Top communities</h3>
+				{groups?.numOfResults ? (
+					<ul>
+						{groups?.suggestionItems?.map((item) => (
+							<SocialSuggestionItem
+								key={item._id}
+								suggestionItem={item}
+								suggestionType="group"
+								addItem={handleAddSuggestionItem}
+							/>
+						))}
+					</ul>
+				) : (
+					<h4 className={classes["no-items-msg"]}>
+						No communities to suggest.
+					</h4>
+				)}
 			</Card>
 			<Card className={classes["list-container"]}>
-				<h3>Suggested pages</h3>
-				<ul>
-					{pages?.suggestionItems?.map((item) => (
-						<SocialSuggestionItem
-							key={item._id}
-							suggestionItem={item}
-							suggestionType="page"
-							addItem={handleAddSuggestionItem}
-						/>
-					)) || noItemsMessageEL}
-				</ul>
+				<h3 className={classes["list-header"]}>Top pages</h3>
+
+				{pages?.numOfResults ? (
+					<ul>
+						{pages?.suggestionItems?.map((item) => (
+							<SocialSuggestionItem
+								key={item._id}
+								suggestionItem={item}
+								suggestionType="page"
+								addItem={handleAddSuggestionItem}
+							/>
+						))}
+					</ul>
+				) : (
+					<h4 className={classes["no-items-msg"]}>No pages to suggest.</h4>
+				)}
 			</Card>
 		</div>
 	);

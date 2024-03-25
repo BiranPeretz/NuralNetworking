@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useRef } from "react";
-import classes from "./SocialRequests.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { fetchSocialList } from "../../store/userThunks";

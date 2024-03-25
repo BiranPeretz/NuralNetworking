@@ -1,38 +1,44 @@
 .filter-buttons {
-	position: relative;
 	display: flex;
-	justify-content: space-around;
+	justify-content: space-between;
 	align-items: center;
-	background-color: rgb(216, 219, 218);
-	left: 2%;
-	width: 96%;
-	height: 30px;
-	border-radius: 10px;
-	margin-top: 10px;
-	margin-bottom: 5px;
+	width: 100%;
+	min-width: min-content;
+	height: 4rem;
+	border-radius: 0.75rem;
+	padding: 1rem;
 }
 
 .filter-buttons button {
-	width: calc(100% / 3);
+	/* width: calc(100% / 3); */
+	/* min-width: 5rem; */
+	width: min-content;
 	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	background-color: transparent;
-	border: 1px solid black;
+	border: none;
 	cursor: pointer;
-	transition: background-color 100ms;
+	transition: transform 100ms;
 }
 
 .filter-buttons button:not(:last-child) {
-	border-right-width: 0px;
+	margin-right: 0.75rem;
 }
 
-.filter-buttons button:first-child {
-	border-radius: 10px 0px 0px 10px;
-}
-.filter-buttons button:last-child {
-	border-radius: 0px 10px 10px 0px;
+.filter-buttons button:hover {
+	transform: scale(1.1);
 }
 
-.filter-buttons button:hover,
 .filter-buttons .active {
 	background-color: rgb(255, 255, 255);
+	border-bottom: 0.1rem solid rgb(186, 186, 186);
+}
+
+.filter-type {
+	color: #323232;
+	font-size: 1rem;
+	white-space: nowrap;
+	margin-left: 0.25rem;
 }

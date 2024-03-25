@@ -1,0 +1,21 @@
+.home {
+	width: 1.59375rem;
+	height: 1.53388rem;
+	flex-shrink: 0;
+}
+
+.bell {
+	width: 1.40625rem;
+	height: 1.71875rem;
+	flex-shrink: 0;
+	cursor: pointer;
+	transition: transform 150ms;
+}
+
+.bell:hover {
+	transform: scale(1.1);
+}
+
+.bell:active {
+	transform: scale(0.9);
+}

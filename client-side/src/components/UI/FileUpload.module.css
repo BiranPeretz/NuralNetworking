@@ -1,0 +1,7 @@
+div.modal {
+	z-index: 50;
+}
+
+.backdrop {
+	z-index: 40;
+}

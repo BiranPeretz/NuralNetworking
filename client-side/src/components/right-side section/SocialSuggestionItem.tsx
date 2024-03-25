@@ -6,6 +6,10 @@ import socialSuggestionItem from "../../types/socialSuggestionItem";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { removeSuggestion } from "../../store/suggestionsSlice";
+import ProfilePicture from "../UI/ProfilePicture";
+import AddItem from "../../assets/icons/AddItem";
+import TrashItem from "../../assets/icons/TrashItem";
+import SocialItem from "../UI/SocialItem";
 
 type Props = {
 	suggestionItem: socialSuggestionItem;
@@ -77,26 +81,17 @@ const SocialSuggestionItem: React.FC<Props> = function (props) {
 	);
 	return (
 		<li className={classes.item} key={props.suggestionItem._id}>
-			<img
-				src={
-					props.suggestionItem.profilePicture ||
-					"https://randomuser.me/api/portraits/thumb/men/76.jpg"
-				}
+			<SocialItem
+				pictureSrc={props.suggestionItem.profilePicture}
+				name={props.suggestionItem.name!}
+				subText={suggestionMSG}
 			/>
-			<div className={classes["item__details"]}>
-				<span className={classes.name}>{props.suggestionItem.name}</span>
-				<span className={classes.connected}>{suggestionMSG}</span>
-			</div>
 			<div className={classes.icons}>
-				<div
-					className={classes["suggestion-icon"]}
+				<AddItem className={classes["icon__add"]} onClick={addSuggestionItem} />
+				<TrashItem
+					className={classes["icon__remove"]}
 					onClick={removeSuggestionItem}
-				>
-					<LiaMinusSolid size="18px" color="red" />
-				</div>
-				<div className={classes["suggestion-icon"]} onClick={addSuggestionItem}>
-					<LiaPlusSolid size="18px" />
-				</div>
+				/>
 			</div>
 		</li>
 	);

@@ -6,45 +6,60 @@ type Props = {
 	name: string;
 	placeholder?: string;
 	defaultValue?: string;
-	ref?: any;
+	displayLabel?: boolean;
 	labelClassName?: string;
 	inputClassName?: string;
-	children?: React.ReactNode;
+	onChange?: (...event: any[]) => void;
+	onBlur?: (...event: any[]) => void;
+	error?: string;
+	ref: React.Ref<any>;
 };
 
-{
-}
-
-const LabledInput = React.forwardRef(function LabledInput(
-	props: Props,
-	ref: React.Ref<HTMLInputElement>
-) {
-	return (
-		<Fragment>
-			<label
-				className={
-					props.labelClassName
-						? `${classes.label} ${props.labelClassName}`
-						: classes.label
-				}
-				htmlFor={props.name}
-			>
-				{props.name.charAt(0).toUpperCase() + props.name.slice(1)}
-			</label>
-			<input
-				className={
-					props.inputClassName
-						? `${classes.input} ${props.inputClassName}`
-						: classes.input
-				}
-				type={props.type}
-				name={props.name}
-				placeholder={props.placeholder}
-				defaultValue={props.defaultValue}
-				ref={ref}
-			/>
-		</Fragment>
-	);
-});
+const LabledInput = React.forwardRef<HTMLInputElement, Props>(
+	function LabledInput(
+		{
+			type,
+			name,
+			placeholder,
+			defaultValue,
+			displayLabel,
+			labelClassName,
+			inputClassName,
+			onChange,
+			onBlur,
+			error,
+			...rest
+		},
+		ref
+	) {
+		return (
+			<Fragment>
+				<label
+					className={`${classes.label} ${labelClassName || ""} ${
+						error && classes["label__error"]
+					} ${displayLabel || error ? "" : classes["label__hide"]}`}
+					htmlFor={name}
+				>
+					{displayLabel
+						? name.charAt(0).toUpperCase() + name.slice(1)
+						: error || ""}
+				</label>
+				<input
+					className={`${classes.input} ${inputClassName || ""} ${
+						error && classes["input__error"]
+					}`}
+					type={type}
+					name={name}
+					placeholder={placeholder}
+					defaultValue={defaultValue}
+					onChange={onChange}
+					onBlur={onBlur}
+					{...rest}
+					ref={ref}
+				/>
+			</Fragment>
+		);
+	}
+);
 
 export default LabledInput;

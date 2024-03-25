@@ -4,6 +4,7 @@ import { getMyData } from "../store/userThunks";
 import { AppDispatch, RootState } from "../store/store";
 import useLogout from "./useLogout";
 import type userType from "../types/user";
+import getToken from "../util/getToken";
 
 export function useProtect() {
 	const [isLoading, setIsLoading] = useState(true);
@@ -18,7 +19,7 @@ export function useProtect() {
 		}
 
 		async function fetchData() {
-			const token = localStorage.getItem("token");
+			const token = getToken();
 			if (!token) {
 				logout();
 				setIsLoading(false);
@@ -29,7 +30,13 @@ export function useProtect() {
 				try {
 					await dispatch(getMyData(token));
 				} catch (error) {
-					// TODO: handle error
+					if (error instanceof Error) {
+						console.error(error.message);
+					} else if (typeof error === "string") {
+						console.error(error);
+					} else {
+						console.error("Unexpected error type:", error);
+					}
 				}
 			}
 			setIsLoading(false);

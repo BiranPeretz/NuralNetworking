@@ -1,0 +1,39 @@
+.backdrop {
+	backdrop-filter: none;
+	background-color: transparent;
+}
+
+.modal {
+	position: fixed;
+	width: min-content;
+	height: min-content;
+	transform: translateX(calc(-100% + calc(2rem + 8px)));
+	padding: 0;
+	border: 1px solid #e2e2e2;
+	border-radius: 0.75rem;
+	z-index: 20;
+}
+
+.arrow-border {
+	position: absolute;
+	top: -16.5px;
+	right: 2rem;
+	width: 0;
+	height: 0;
+	border-left: 12px solid transparent;
+	border-right: 12px solid transparent;
+	border-bottom: 16px solid #e2e2e2;
+	z-index: inherit;
+}
+
+.arrow {
+	position: absolute;
+	top: -15px;
+	right: 2rem;
+	width: 0;
+	height: 0;
+	border-left: 12px solid transparent;
+	border-right: 12px solid transparent;
+	border-bottom: 16px solid rgb(255, 255, 255);
+	z-index: inherit;
+}

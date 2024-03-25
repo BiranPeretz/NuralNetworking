@@ -1,11 +1,18 @@
 import classes from "./NavButton.module.css";
 import { Link } from "react-router-dom";
 
-const NavButton: React.FC<{ icon: React.ReactNode; to: string }> = function (
-	props
-) {
+const NavButton: React.FC<{
+	icon: React.ReactNode;
+	to: string;
+	isActive?: boolean;
+}> = function (props) {
 	return (
-		<Link className={classes["icon-button"]} to={props.to}>
+		<Link
+			className={`${classes["icon-button"]} ${
+				props.isActive ? classes.active : ""
+			}`}
+			to={props.to}
+		>
 			{props.icon}
 		</Link>
 	);

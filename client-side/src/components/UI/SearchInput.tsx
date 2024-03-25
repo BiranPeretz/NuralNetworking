@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./SearchInput.module.css";
-import { PiMagnifyingGlassDuotone } from "react-icons/pi";
+import MagnifyingGlass from "../../assets/icons/MagnifyingGlass";
 
 type Props = {
 	inputName: string;
@@ -8,7 +8,7 @@ type Props = {
 	inputClassName?: string;
 	inputType?: string;
 	placeholder?: string;
-	iconSize?: string;
+	defaultValue?: string;
 	onInputChange?: (...args: any[]) => any;
 	onIconClick?: (...args: any[]) => any;
 };
@@ -17,29 +17,19 @@ const SearchInput = React.forwardRef(function SearchInput(
 	props: Props,
 	ref: React.Ref<HTMLInputElement>
 ) {
-	const bothClassNames = props.className
-		? `${classes.container} ${props.className}`
-		: classes.container;
-
-	const bothInputClassNames = props.inputClassName
-		? `${classes.input} ${props.inputClassName}`
-		: classes.input;
 	return (
-		<div className={bothClassNames}>
+		<div className={`${classes.container} ${props.className || ""}`}>
 			<input
-				className={bothInputClassNames}
+				className={`${classes.input} ${props.inputClassName || ""}`}
 				type={props.inputType || "text"}
 				name={props.inputName}
 				placeholder={props.placeholder}
+				defaultValue={props.defaultValue}
 				onChange={props.onInputChange}
 				ref={ref}
 			/>
 
-			<PiMagnifyingGlassDuotone
-				className={classes.icon}
-				size={props.iconSize}
-				onClick={props.onIconClick}
-			/>
+			<MagnifyingGlass className={classes.icon} onClick={props.onIconClick} />
 		</div>
 	);
 });

@@ -33,7 +33,7 @@ export const getMyData = function (token: string) {
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 			const user = data?.data?.user as userType;
@@ -51,6 +51,14 @@ export const getMyData = function (token: string) {
 
 export const createGroup = function (token: string, newGroup: groupRequired) {
 	return async function (dispatch: any) {
+		const formData = new FormData();
+
+		formData.append("name", newGroup.name!);
+		formData.append("description", newGroup.description!);
+		if (newGroup.profilePicture) {
+			formData.append("image", newGroup.profilePicture);
+		}
+
 		try {
 			const response = await fetch(
 				import.meta.env.VITE_SERVER_URL + `groups/createGroup`,
@@ -58,32 +66,39 @@ export const createGroup = function (token: string, newGroup: groupRequired) {
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(newGroup),
+					body: formData,
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
-				throw new Error(`client-error:${data.message}`);
+			if (!(data?.status === "success")) {
+				throw new Error(data?.message);
 			}
-			const { _id, name, profilePicture } = data.data.group;
+			const { _id, name, profilePicture } = data?.data?.group;
 			const group: socialItemType = { _id, name, profilePicture };
 			const connectionItem: groupConnectionType =
-				data.data.user.groupsList.filter(
-					(item: any) => item.group === data.data.group._id
+				data?.data?.user?.groupsList?.filter(
+					(item: any) => item.group === data?.data?.group?._id
 				)[0];
 			connectionItem.group = group;
 
 			dispatch(addGroups([connectionItem]));
 		} catch (error) {
-			console.error(error);
+			throw error;
 		}
 	};
 };
 
 export const createPage = function (token: string, newPage: pageRequired) {
 	return async function (dispatch: any) {
+		const formData = new FormData();
+
+		formData.append("name", newPage.name!);
+		formData.append("description", newPage.description!);
+		if (newPage.profilePicture) {
+			formData.append("image", newPage.profilePicture);
+		}
+
 		try {
 			const response = await fetch(
 				import.meta.env.VITE_SERVER_URL + `pages/createPage`,
@@ -91,15 +106,15 @@ export const createPage = function (token: string, newPage: pageRequired) {
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(newPage),
+					body: formData,
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
-				throw new Error(`client-error:${data.message}`);
+			if (!(data?.status === "success")) {
+				throw new Error(data?.message);
 			}
+
 			const { _id, name, profilePicture } = data.data.page;
 			const page: socialItemType = { _id, name, profilePicture };
 			const connectionItem: pageConnectionType =
@@ -110,7 +125,7 @@ export const createPage = function (token: string, newPage: pageRequired) {
 
 			dispatch(addPages([connectionItem]));
 		} catch (error) {
-			console.error(error);
+			throw error;
 		}
 	};
 };
@@ -134,7 +149,7 @@ export const fetchSocialList = function (
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 			console.log(data);
@@ -164,7 +179,7 @@ export const fetchSocialSuggestions = function (
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 			console.log(data);
@@ -200,7 +215,7 @@ export const addConnection = function (
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 
@@ -260,7 +275,7 @@ export const removeListItem = function (
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 
@@ -285,7 +300,7 @@ export const sendFriendRequest = function (token: string, itemId: string) {
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 			dispatch(
@@ -314,7 +329,7 @@ export const rejectFriendRequest = function (token: string, itemId: string) {
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 
@@ -344,7 +359,7 @@ export const acceptFriendRequest = function (token: string, itemId: string) {
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 

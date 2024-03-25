@@ -23,7 +23,6 @@ const initialState: stateType = {
 	pages: null,
 	isLoading: false,
 };
-//TODO: add persistence to removedSuggestions arrays
 const suggestionsSlice = createSlice({
 	name: "suggestions",
 	initialState,

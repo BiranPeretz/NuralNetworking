@@ -1,0 +1,43 @@
+svg {
+	cursor: pointer;
+}
+
+.magnifying-glass {
+	width: 1rem;
+	height: 1rem;
+	stroke-width: 2px;
+	stroke: #4c4c5a;
+	background-color: inherit;
+}
+
+.trash > * {
+	transition: stroke 150ms;
+}
+
+.trash:hover > * {
+	stroke: red;
+}
+
+.send {
+	transition: transform 150ms;
+}
+
+.send:hover {
+	transform: scale(1.2);
+}
+
+.send path {
+	transition: fill 150ms;
+}
+
+.send:hover path {
+	fill: rgb(68, 68, 68);
+}
+
+.close-x path {
+	transition: fill 100ms;
+}
+
+.close-x:hover path {
+	fill: rgb(255, 17, 17);
+}

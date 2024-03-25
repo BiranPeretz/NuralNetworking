@@ -1,17 +1,19 @@
 import React, { useEffect, useRef } from "react";
 import classes from "./NotificationsMenu.module.css";
-import Card from "../../UI/Card";
 import NotificationsItem from "./NotificationsItem";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchNotifications } from "../../../store/notificationsThunks";
 import type { RootState, AppDispatch } from "../../../store/store";
+import { fetchNotifications } from "../../../store/notificationsThunks";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import getToken from "../../../util/getToken";
 import { FadeLoader } from "react-spinners";
 import { readAllNotification } from "../../../store/notificationsThunks";
+import { MenuDisplayStateType } from "./Notifications";
 
 type Props = {
+	isNoNewNotifications: boolean;
+	setMenuDisplayState: (menuDisplayState: any) => any;
 	children?: React.ReactNode;
 };
 
@@ -34,9 +36,21 @@ const NotificationsMenu: React.FC<Props> = function (props) {
 		hadInitialFetch.current = true; //For dev env
 	}, []);
 
-	const handleFetchNotifications = function () {
-		dispatch(fetchNotifications(token!, isNoMoreItems, lastItemTimestamp));
-	};
+	useEffect(() => {
+		if (
+			hadInitialFetch.current === true &&
+			notifications.length > 0 &&
+			hasNonRead === false &&
+			props.isNoNewNotifications === false
+		) {
+			props.setMenuDisplayState(
+				(prevState: MenuDisplayStateType): MenuDisplayStateType => ({
+					...prevState,
+					isNoNewNotifications: true,
+				})
+			);
+		}
+	}, [notifications]);
 
 	useEffect(() => {
 		const simpleBarInstance = scrollRef.current.getScrollElement();
@@ -49,9 +63,6 @@ const NotificationsMenu: React.FC<Props> = function (props) {
 				if (scrollTop + clientHeight >= scrollHeight - threshold) {
 					isFetching.current = true;
 
-					console.log(lastItemTimestamp);
-					console.log(notifications);
-					// Fetch more data from your server here
 					dispatch(fetchNotifications(token!, isNoMoreItems, lastItemTimestamp))
 						.catch((err) =>
 							console.error(
@@ -59,7 +70,6 @@ const NotificationsMenu: React.FC<Props> = function (props) {
 							)
 						)
 						.finally(() => {
-							// Re-add the scroll listener after the desired cooldown
 							setTimeout(() => {
 								isFetching.current = false;
 							}, 200);
@@ -72,34 +82,39 @@ const NotificationsMenu: React.FC<Props> = function (props) {
 		return () => simpleBarInstance.removeEventListener("scroll", handleScroll);
 	}, [scrollRef, lastItemTimestamp]);
 
+	//check if there is at least one new notification
+	const hasNonRead = notifications?.some(
+		(notificationItem) => notificationItem?.isRead === false
+	);
+
 	const readAllHandler = function () {
 		//check if at least one notification is not read
-		if (
-			notifications?.some(
-				(notificationItem) => notificationItem?.isRead === false
-			)
-		) {
+		if (hasNonRead) {
 			dispatch(readAllNotification(token!));
 		}
+		props.setMenuDisplayState({
+			isNoNewNotifications: true,
+			oldNotificationsClick: false,
+		});
 	};
 
 	return (
-		<Card className={classes.notifications}>
-			<div className={classes.header}>
-				<h2>Notifications</h2>
+		<div className={classes.notifications}>
+			<div className={classes["top-container"]}>
+				<h2 className={classes.header}>Notifications</h2>
 				<button
 					className={classes["read-all"]}
 					type="button"
 					onClick={readAllHandler}
 				>
-					read all
+					Mark all as read
 				</button>
 			</div>
 			<SimpleBar
 				style={{
 					position: "relative",
 					width: "100%",
-					maxHeight: "87%",
+					maxHeight: "calc(100% - 4rem)",
 				}}
 				ref={scrollRef}
 			>
@@ -107,10 +122,6 @@ const NotificationsMenu: React.FC<Props> = function (props) {
 					{notifications?.map((item) => (
 						<NotificationsItem key={item._id} notificationItem={item} />
 					))}
-					{!isLoading && !isNoMoreItems && (
-						<button onClick={handleFetchNotifications}>more</button>
-					)}
-
 					{isLoading && (
 						<div className={classes.loader}>
 							<FadeLoader
@@ -123,10 +134,14 @@ const NotificationsMenu: React.FC<Props> = function (props) {
 							/>
 						</div>
 					)}
-					{isNoMoreItems && <h5>No more notifications.</h5>}
+					{isNoMoreItems && (
+						<h4 className={classes["no-more-notifications"]}>
+							No more notifications.
+						</h4>
+					)}
 				</div>
 			</SimpleBar>
-		</Card>
+		</div>
 	);
 };
 

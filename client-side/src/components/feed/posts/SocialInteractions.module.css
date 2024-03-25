@@ -1,0 +1,41 @@
+.container {
+	width: 100%;
+	min-width: min-content;
+	height: min-content;
+	padding: 0.75rem 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid #e9e9e9;
+	border-top: 1px solid #e9e9e9;
+}
+
+.interaction {
+	width: fit-content;
+	min-width: min-content;
+	height: 100%;
+	background: #ebebeb;
+	border: none;
+	border-radius: 1rem;
+	display: flex;
+	align-items: center;
+	padding: 0.25rem 1rem;
+	margin: 0 1rem;
+	transition: transform 125ms;
+}
+
+.interaction:hover {
+	transform: scale(1.125);
+}
+
+.interaction:active {
+	transform: scale(1);
+}
+
+.engagements {
+	font-size: 1rem;
+	letter-spacing: 0.1rem;
+	font-weight: 500;
+	white-space: nowrap;
+	margin-left: 0.5rem;
+}

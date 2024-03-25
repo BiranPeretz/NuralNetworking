@@ -8,6 +8,7 @@ type Props = {
 	id?: string;
 	className?: string;
 	children?: React.ReactNode;
+	style?: Object;
 	onClick?: () => void;
 };
 
@@ -18,11 +19,8 @@ const RectangleButton: React.FC<Props> = function (props) {
 			name={props.name}
 			type={props.type}
 			value={props.type}
-			className={
-				props.className
-					? `${classes.container} ${props.className}`
-					: classes.container
-			}
+			className={`${classes.container} ${props.className || ""}`}
+			style={props.style}
 			onClick={props.onClick}
 		>
 			{props.children}

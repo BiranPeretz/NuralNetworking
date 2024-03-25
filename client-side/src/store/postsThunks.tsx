@@ -23,11 +23,11 @@ export const fetchPosts = function (
 		if (isNoMoreItems) {
 			return;
 		}
-		dispatch(fetchPostsStart());
 
 		if (reset) {
 			dispatch(clearPostsData());
 		}
+		dispatch(fetchPostsStart());
 
 		try {
 			const response = await fetch(
@@ -47,7 +47,7 @@ export const fetchPosts = function (
 			const data = await response.json();
 			console.log(response);
 			console.log(data);
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 			data.data.forEach((item: any) => {
@@ -105,8 +105,8 @@ export const createPost = function (token: string, newPost: postRequired) {
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
-				throw new Error(`client-error:${data.message}`);
+			if (!(data?.status === "success")) {
+				throw new Error(data?.message);
 			}
 			const post = data.data.post;
 			if (post?.creatorID?.fullName) {
@@ -124,8 +124,8 @@ export const createPost = function (token: string, newPost: postRequired) {
 				})
 			);
 		} catch (error) {
-			console.error(error);
 			dispatch(fetchPostsFail(error as Error));
+			throw error;
 		}
 	};
 };
@@ -148,14 +148,20 @@ export const likeAndUnlike = function (
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
+			const postCommentsSection =
+				model === "comments" ? data?.data?.post?.commentsList : undefined;
 			const payload = {
 				postID: data.data.postID,
 				likeList: data.data.likeList as likeType[],
 				commentID: data.data.commentID,
+				postCommentsSection,
 			};
+			if (model === "comments") {
+				payload.postCommentsSection = data?.data?.post?.commentsList;
+			}
 			dispatch(setLikeList(payload));
 		} catch (error) {
 			console.error(error);
@@ -163,7 +169,7 @@ export const likeAndUnlike = function (
 	};
 };
 
-export const newPostComment = function (
+export const createComment = function (
 	token: string,
 	content: string,
 	parentID: string,
@@ -186,7 +192,7 @@ export const newPostComment = function (
 				}
 			);
 			const data = await response.json();
-			if (!response.ok) {
+			if (!(data?.status === "success")) {
 				throw new Error(`client-error:${data.message}`);
 			}
 

@@ -1,0 +1,13 @@
+.header {
+	width: 100%;
+	height: min-content;
+	display: flex;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.timestamp {
+	color: #bebec6;
+	white-space: nowrap;
+	margin-left: auto;
+}

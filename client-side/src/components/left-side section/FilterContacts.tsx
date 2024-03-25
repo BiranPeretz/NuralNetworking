@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import classes from "./FilterContacts.module.css";
-import type { RootState, AppDispatch } from "../../store/store";
-import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch } from "../../store/store";
+import { useDispatch } from "react-redux";
 import { fetchSocialList } from "../../store/userThunks";
 import getToken from "../../util/getToken";
+import friendsFeedIcon from "../../assets/icons/nav-icons/friends";
+import groupsFeedIcon from "../../assets/icons/nav-icons/groups";
+import pagesFeedIcon from "../../assets/icons/nav-icons/pages";
 
 type Props = {
 	setDisplayList: (
@@ -11,30 +14,22 @@ type Props = {
 	) => void;
 };
 
-type FetchedListsType = {
-	friendsList: boolean;
-	groupsList: boolean;
-	pagesList: boolean;
-};
-
 const FilterContacts: React.FC<Props> = function (props) {
 	const dispatch = useDispatch<AppDispatch>();
 	const token = getToken();
 	const [activeButton, setActiveButton] = useState<HTMLElement | null>(null);
 	const friendsButtonRef = useRef<HTMLButtonElement | null>(null);
-	const hasFechedFriends = useRef(false);
-	const [fetchedLists, setFetchedLists] = useState<FetchedListsType>({
-		friendsList: true,
-		groupsList: false,
-		pagesList: false,
-	});
+	const hasFeched = useRef(false);
 
 	useEffect(() => {
 		setActiveButton(friendsButtonRef.current); //set frineds button as active
-		if (import.meta.env.PROD || !hasFechedFriends.current) {
-			dispatch(fetchSocialList(token!, "friendsList")); //fetch friends once automatically
+		if (import.meta.env.PROD || !hasFeched.current) {
+			//fetch all social lists data once
+			dispatch(fetchSocialList(token!, "friendsList"));
+			dispatch(fetchSocialList(token!, "groupsList"));
+			dispatch(fetchSocialList(token!, "pagesList"));
 		}
-		hasFechedFriends.current = true; //For dev env
+		hasFeched.current = true; //For dev env
 	}, []);
 
 	useEffect(() => {
@@ -49,45 +44,36 @@ const FilterContacts: React.FC<Props> = function (props) {
 		listName: string,
 		event: React.MouseEvent
 	) {
-		setActiveButton(event.target as HTMLElement);
+		setActiveButton(event.currentTarget as HTMLElement);
 		props.setDisplayList(
 			listName as "friendsList" | "groupsList" | "pagesList"
 		);
-
-		if (fetchedLists[listName as keyof FetchedListsType]) {
-			console.log(fetchedLists);
-			return;
-		}
-		dispatch(
-			fetchSocialList(
-				token!,
-				listName as "friendsList" | "groupsList" | "pagesList"
-			)
-		);
-
-		setFetchedLists((prev) => ({ ...prev, [listName]: true }));
 	};
 
 	return (
 		<div className={classes["filter-buttons"]}>
 			<button
+				className=""
 				name="friends"
 				onClick={filterContactsHandler.bind(null, "friendsList")}
 				ref={friendsButtonRef}
 			>
-				Friends
+				{friendsFeedIcon(0.66)}
+				<h4 className={classes["filter-type"]}>Friends</h4>
 			</button>
 			<button
 				name="groups"
 				onClick={filterContactsHandler.bind(null, "groupsList")}
 			>
-				Groups
+				{groupsFeedIcon(0.66)}
+				<h4 className={classes["filter-type"]}>Groups</h4>
 			</button>
 			<button
 				name="pages"
 				onClick={filterContactsHandler.bind(null, "pagesList")}
 			>
-				Pages
+				{pagesFeedIcon(0.66)}
+				<h4 className={classes["filter-type"]}>Pages</h4>
 			</button>
 		</div>
 	);

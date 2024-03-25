@@ -1,58 +1,34 @@
 .item {
-	position: relative;
 	width: 100%;
-	height: 48px;
-	margin: 5px;
+	height: 3.5rem;
+	padding: 0.25rem;
 	display: flex;
 	align-items: center;
-	justify-content: flex-start;
 }
 
-.item img {
-	margin-right: 10px;
-}
-
-.item h4 {
-	color: black;
-	font-size: 20px;
-}
-
-.item__details {
+.icons {
+	height: 3rem;
+	margin-left: auto;
 	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-}
-
-.item__details .name {
-	color: black;
-	font-size: 20px;
-}
-
-.item__details .connected {
-	color: rgb(126, 126, 126);
-	font-size: 14px;
-}
-
-.item .icons {
-	position: absolute;
-	right: 0;
-	display: flex;
-	justify-content: center;
-}
-
-.suggestion-icon {
-	width: 22px;
-	height: 22px;
-	background-color: transparent;
-	border: 1px solid transparent;
-	border-radius: 11px;
-	margin-left: 7px;
-	display: flex;
-	justify-content: center;
 	align-items: center;
-	transition: border-color 250ms;
 }
 
-.suggestion-icon:hover {
-	border-color: #cecece;
+.icons > * {
+	margin-left: 0.5rem;
+}
+
+.icon__add {
+	transition: transform 150ms;
+}
+
+.icon__add:hover {
+	transform: scale(1.2) rotate(90deg);
+}
+
+.icon__remove {
+	transition: transform 150ms;
+}
+
+.icon__remove:hover {
+	transform: scale(1.2);
 }

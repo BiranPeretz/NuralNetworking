@@ -1,0 +1,18 @@
+:root {
+	--image-size: 3rem;
+}
+
+.image {
+	width: var(--image-size);
+	min-width: var(--image-size);
+	height: var(--image-size);
+	min-height: var(--image-size);
+	border-radius: 2rem;
+}
+
+.icon {
+	width: var(--image-size);
+	min-width: var(--image-size);
+	height: var(--image-size);
+	min-height: var(--image-size);
+}

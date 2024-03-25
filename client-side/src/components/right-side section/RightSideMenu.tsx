@@ -7,21 +7,18 @@ import "simplebar/dist/simplebar.min.css";
 
 const RightSideMenu: React.FC = function () {
 	return (
-		<SimpleBar
-			style={{
-				position: "fixed",
-				top: "10%",
-				right: "0px",
-				bottom: "3%",
-				width: "15%",
-				maxHeight: "100%",
-			}}
-		>
-			<div className={classes.menu}>
+		<div className={classes.menu}>
+			<SimpleBar
+				style={{
+					height: "calc(100% - 0.5rem)",
+					paddingRight: "0.5rem",
+					paddingLeft: "0.25rem",
+				}}
+			>
 				<SocialRequests />
 				<SocialSuggestions />
-			</div>
-		</SimpleBar>
+			</SimpleBar>
+		</div>
 	);
 };
 

@@ -1,17 +1,19 @@
 .card {
-	background-color: #fff;
-	border-radius: 8px;
-	/* border: 1px solid #ccc; */
-	padding: 15px;
+	background-color: white;
+	border-radius: 0.625rem;
+	border: 1px solid #e2e2e2;
+	padding: 1rem;
+	margin: 0 4px 12px 4px; /*minimal margin for shadow value*/
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	transition: box-shadow 200ms;
 }
 
 .card:hover {
-	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-	transition: box-shadow 0.3s ease-in-out;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card__title {
-	font-size: 18px;
-	font-weight: bold;
-	margin-bottom: 10px;
+	font-size: 1.125rem;
+	font-weight: 600;
+	margin-bottom: 0.625rem;
 }

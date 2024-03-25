@@ -1,36 +1,64 @@
 .form {
+	width: 24rem;
+	height: fit-content;
+	margin-top: 2.5rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	font-family: "Roboto", sans-serif;
+	align-items: center;
 }
 
-.form button {
+.form > *:not(:last-child) {
+	margin-bottom: 1.25rem;
+}
+
+.form .submit {
 	width: 100%;
-	height: 40px;
-	background-color: black;
-	color: white;
-	border-radius: 5px;
-	margin: 10px 0px;
-	font-size: 16px;
+	height: 3rem;
+	margin: 2rem 0;
 	border: none;
-	transition: background-color 200ms;
-}
-
-.form button:hover {
+	border-radius: 3rem;
+	color: white;
+	background-color: black;
+	border: 3px solid transparent;
 	cursor: pointer;
-	background-color: rgb(90, 90, 90);
+	transition: all 150ms;
 }
 
-.form h6 {
-	font-size: 13px;
+.submit:hover {
+	background-color: rgba(0, 0, 0, 0.85);
+	transform: scale(1.03);
 }
 
-.form h6 span {
-	color: blue;
+.submit__text {
+	font-size: 1.25rem;
+	letter-spacing: 0.05rem;
 }
 
-.form h6 span:hover {
+.text {
+	font-family: "Poppins", sans-serif;
+	font-size: 0.875rem;
+	color: #7e7e7e;
+}
+
+.text-button {
+	font-family: "Poppins", sans-serif;
+	font-size: 0.875rem;
+	color: black;
+}
+
+.text-button:hover {
 	cursor: pointer;
-	color: purple;
+	text-decoration: underline;
+}
+
+button.submit.disabled-button {
+	background-color: #7e7e7e;
+	color: #bebebe;
+	cursor: wait;
+	border: none;
+}
+
+button.submit.disabled-button:hover {
+	transform: none;
 }

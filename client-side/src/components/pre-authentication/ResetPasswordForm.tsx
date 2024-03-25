@@ -1,118 +1,154 @@
-import React, { useRef } from "react";
+import React from "react";
 import classes from "./Forms.module.css";
 import { Form, useNavigate } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
 import userType from "../../types/user";
 import { authenticateUser } from "../../store/userSlice";
 import LabledInput from "../UI/LabledInput";
+import { signupSchema } from "./SignupForm";
+import { PreAuthModalsNames } from "./Welcome";
 
 type Props = {
 	changeModal: (
-		modalName:
-			| "login"
-			| "signup"
-			| "createProfile"
-			| "forgotPassword"
-			| "resetPassword"
+		modalName: PreAuthModalsNames,
+		sourceModalName?: PreAuthModalsNames
 	) => void;
+	originModalName?: PreAuthModalsNames;
 };
 
-//TODO: refactor to combine with other forms?
+export const resetPasswordSchema = signupSchema.omit({ email: true }).merge(
+	z.object({
+		token: z
+			.string()
+			.min(1, { message: "Reset token is required." })
+			.length(64, { message: "Token must be exactly 64 characters long." }),
+	})
+);
+
+type FormFields = z.infer<typeof resetPasswordSchema>;
+
 const ResetPasswordForm: React.FC<Props> = function (props) {
+	const {
+		register,
+		handleSubmit,
+		setError,
+		formState: { errors, isSubmitting },
+	} = useForm<FormFields>({
+		resolver: zodResolver(resetPasswordSchema),
+	});
+
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	//email and password input references
-	const tokenRef = useRef<HTMLInputElement>(null);
-	const passwordRef = useRef<HTMLInputElement>(null);
-	const passwordConfirmRef = useRef<HTMLInputElement>(null);
-
-	const submitFormHandler = async function (event: React.FormEvent) {
-		event.preventDefault();
+	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
-			if (
-				!tokenRef.current!.value ||
-				!passwordRef.current!.value ||
-				!passwordConfirmRef.current!.value
-			) {
-				//TODO: handle/dispaly one of the inputs is missing to the user
-				return;
+			if (!(data?.password === data?.passwordConfirm)) {
+				throw new Error("Password confirmation does not match password.");
 			}
 
-			const bodyObj = {
-				password: passwordRef.current!.value,
-				passwordConfirm: passwordConfirmRef.current!.value,
-			};
-			const res = await fetch(
-				import.meta.env.VITE_SERVER_URL +
-					`users/resetPassword/${tokenRef.current!.value}`,
+			const result = await fetch(
+				import.meta.env.VITE_SERVER_URL + `users/resetPassword/${data?.token}`,
 				{
 					method: "PATCH",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(bodyObj),
+					body: JSON.stringify(data),
 				}
 			);
-			const data = await res?.json();
-			if (!res?.ok) {
-				console.log(data.message);
-				//TODO: handle the errors sent by the server and leave the message logging/displaing to the catch block
-				return;
+
+			const resultData = await result?.json();
+
+			if (!(resultData?.status === "success")) {
+				throw new Error(resultData.message);
 			}
 
-			console.log(data);
-
 			//store JWT token in local storage
-			localStorage.setItem("token", data.token);
+			localStorage.setItem("token", resultData?.token);
 
 			const user: userType = {
-				_id: data.data.user._id,
-				email: data.data.user.email,
+				_id: resultData?.data?.user?._id,
+				email: resultData?.data?.user?.email,
 				friendsList: [],
 				groupsList: [],
 				pagesList: [],
 				friendRequestsList: [],
 			};
-			if (!data.data.user.fullName) {
+
+			if (!resultData?.data?.user?.fullName) {
 				dispatch(authenticateUser(user));
-				props.changeModal("createProfile");
+				props.changeModal("createProfile", "resetPassword");
 				return;
 			}
 
-			user.fullName = data.data.user.fullName;
-			user.profilePicture = data.data.user.profilePicture;
-			user.about = data.data.user.about;
+			user.fullName = resultData?.data?.user?.fullName;
+			user.profilePicture = resultData?.data?.user?.profilePicture;
+			user.about = resultData?.data?.user?.about;
+			user.verifiedEmail = resultData?.data?.user?.verifiedEmail;
 
 			dispatch(authenticateUser(user));
 			navigate("/feed");
-		} catch (err) {
-			console.log(err);
+		} catch (error) {
+			setError("root", {
+				message: (error as Error)?.message || "Error resetting password.",
+			});
 		}
 	};
+
 	return (
-		<Form method="post" className={classes.form} onSubmit={submitFormHandler}>
-			<h6>
+		<Form
+			method="post"
+			className={classes.form}
+			onSubmit={handleSubmit(onSubmit)}
+		>
+			{errors?.root && (
+				<span style={{ fontSize: "1rem", color: "red" }}>
+					{errors?.root?.message}
+				</span>
+			)}
+			<h6
+				className={classes.text}
+				style={{
+					fontSize: "1rem",
+					lineHeight: "1.25rem",
+					fontWeight: "600",
+					color: "black",
+				}}
+			>
 				Password reset token has been sent to your email, please attach it
 				below.
 			</h6>
 			<LabledInput
+				{...register("token")}
 				type="text"
 				name="token"
-				placeholder="Paste password reset token here"
-				ref={tokenRef}
+				placeholder="Token"
+				error={errors?.token?.message}
 			/>
 			<LabledInput
+				{...register("password")}
 				type="password"
 				name="password"
-				placeholder="Enter new password"
-				ref={passwordRef}
+				placeholder="Password"
+				error={errors?.password?.message}
 			/>
 			<LabledInput
+				{...register("passwordConfirm")}
 				type="password"
-				name="Confirm"
-				placeholder="Confirm new password"
-				ref={passwordConfirmRef}
+				name="passwordConfirm"
+				placeholder="Confirm password"
+				error={errors?.passwordConfirm?.message}
 			/>
-			<button type="submit">Submit!</button>
+			<button
+				disabled={isSubmitting}
+				className={`${classes.submit} ${
+					isSubmitting && classes["disabled-button"]
+				}`}
+				type="submit"
+			>
+				<h2 className={classes["submit__text"]}>Continue</h2>
+			</button>
 		</Form>
 	);
 };

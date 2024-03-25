@@ -56,48 +56,23 @@ const notificationsSlice = createSlice({
 			state.isLoading = false;
 			state.error = action.payload;
 		},
-		//TODO: delete or correct functions below
-		// createPostsSuccess: function (
-		// 	state,
-		// 	action: PayloadAction<{
-		// 		post: postType;
-		// 	}>
-		// ) {
-		// 	state.posts.unshift(action.payload.post);
-		// 	state.isLoading = false;
-		// },
-		// setLikeList: function (
-		// 	state,
-		// 	action: PayloadAction<{
-		// 		postID: string;
-		// 		likeList: likeType[];
-		// 		commentID?: string;
-		// 	}>
-		// ) {
-		// 	state.posts.find((post) => {
-		// 		if (post._id === action.payload.postID) {
-		// 			if (action.payload.commentID) {
-		// 				post.commentsList.find((comment) => {
-		// 					if (comment._id === action.payload.commentID) {
-		// 						comment.likeList = action.payload.likeList || [];
-		// 					}
-		// 				});
-		// 			} else {
-		// 				post.likeList = action.payload.likeList || [];
-		// 			}
-		// 		}
-		// 	});
-		// },
-		// addPostComment: function (
-		// 	state,
-		// 	action: PayloadAction<{ postID: string; commentsList: commentType[] }>
-		// ) {
-		// 	state.posts.find((post) => {
-		// 		if (post._id === action.payload.postID) {
-		// 			post.commentsList = action.payload.commentsList;
-		// 		}
-		// 	});
-		// },
+		setReadNotification: function (
+			state,
+			action: PayloadAction<{ _id: string }>
+		) {
+			state.notifications?.find((item) => {
+				if (item._id === action.payload._id) {
+					item.isRead = true;
+				}
+			});
+		},
+		setReadAllNotification: function (state) {
+			if (state.notifications?.length > 0) {
+				state.notifications?.forEach((item) => {
+					item.isRead = true;
+				});
+			}
+		},
 	},
 });
 
@@ -106,8 +81,7 @@ export const {
 	fetchNotificationsStart,
 	fetchNotificationsSuccess,
 	fetchNotificationsFail,
-	// createPostsSuccess,
-	// setLikeList,
-	// addPostComment,
+	setReadNotification,
+	setReadAllNotification,
 } = notificationsSlice.actions;
 export default notificationsSlice.reducer;

@@ -1,0 +1,17 @@
+.no-comments {
+	font-size: 1rem;
+	margin-top: 0.75rem;
+	color: #a5a5ad;
+}
+
+.comments {
+	margin-top: 1rem;
+}
+
+.comments-list {
+	width: fit-content;
+	min-width: 100%;
+	height: min-content;
+	display: flex;
+	flex-direction: column;
+}
