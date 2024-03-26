@@ -19,7 +19,6 @@ const signToken = (id) => {
 //TODO: decide about cookie related code and if using or not
 const createSendToken = (user, statusCode, res) => {
 	const token = signToken(user._id);
-	console.log(`FROM CREATESENDTOKEN, JWT TOKEN:${token}`); //TODO: delete me
 	const cookieOptions = {
 		//Define token cookie properties
 		expires: new Date(

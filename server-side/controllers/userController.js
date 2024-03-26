@@ -95,28 +95,23 @@ exports.createProfile = catchAsync(async function (req, res, next) {
 	res.status(200).json({ status: "success", data: { user: updatedUser } });
 });
 
-//TODO: refactor this and removeListItem as both functions are very similar
-//Add item to user social list (friends, groups, pages, friendRequests)
-exports.addListItem = async function (req, res, next) {
+exports.modifyListItem = async function (req, res, next, isAddInternal = null) {
+	let isAdd;
+	if (isAddInternal === false || isAddInternal === true) {
+		isAdd = isAddInternal;
+	} else {
+		isAdd = req.originalUrl.includes("/addListItem");
+	}
+
 	try {
 		const { list, itemId } = req.body;
 		const listType = list.slice(0, -5); //friend || group || page || friendRequest
-
-		// validate list value
-		if (
-			!list ||
-			(list !== "friendsList" &&
-				list !== "groupsList" &&
-				list !== "pagesList" &&
-				list !== "friendRequestsList")
-		) {
-			throw new AppError("Please provide a valid list property.", 400);
-		}
 
 		let model;
 		let itemListName;
 		let notificationType;
 		let notificationInitiatorType;
+		//validate list value and initialize variables
 		switch (list) {
 			case "friendsList":
 				//limit adding friends for internal requests only
@@ -152,53 +147,87 @@ exports.addListItem = async function (req, res, next) {
 				notificationType = "friend request";
 				notificationInitiatorType = "User";
 				break;
+			default:
+				throw new AppError("Please provide a valid list value.", 400);
 		}
 
 		//check if item exists on database on supposed collection
 		const itemExists = await model.findById({ _id: itemId.toString() });
 		if (!itemExists) {
-			throw new AppError("Provided item does not exist on provided list.", 404);
+			throw new AppError(
+				"Provided item does not exist on supposed collection.",
+				404
+			);
 		}
 
-		//check if list already contains the item
-		if (
-			req.user[list].some((item) => {
-				console.log(item[listType]);
-				console.log(listType);
-				return item[listType]?._id.toString() === itemId?.toString();
-			})
-		) {
-			throw new AppError("Item already exists in the list.", 400);
-		}
-
-		//construct the query
-		const query = { $push: {} };
-		query.$push[list] = req.senderQuery || {
-			[listType]: itemExists._id,
-			connection: {
-				status: "accepted",
-				timestamp: Date.now(),
-			},
-		};
-		// update user's list
-		const updatedUser = await User.findByIdAndUpdate(req.user.id, query, {
-			new: true,
-			runValidators: true,
+		//check if list already contain the item
+		const isContained = req.user[list].some((item) => {
+			return item[listType]?._id.toString() === itemId?.toString();
 		});
 
-		const itemQuery = { $push: {} };
-		if (listType === "friend" || listType === "friendRequest") {
-			itemQuery.$push[itemListName] = req.receiverQuery || {
-				[listType]: updatedUser._id,
+		if (isAdd && isContained) {
+			throw new AppError(
+				"Cannot add item that already exist on the list.",
+				400
+			);
+		} else if (!isAdd && !isContained) {
+			throw new AppError(
+				"Cannot remove item that dosent exist on the list.",
+				400
+			);
+		}
+
+		//construct the updating query
+		let query;
+		if (isAdd) {
+			query = { $push: {} };
+			query.$push[list] = req.senderQuery || {
+				[listType]: itemExists._id,
 				connection: {
 					status: "accepted",
 					timestamp: Date.now(),
 				},
 			};
 		} else {
-			itemQuery.$push[itemListName] = updatedUser._id;
+			query = { $pull: {} };
+			query.$pull[list] = {
+				[listType]: itemExists._id,
+			};
 		}
 
+		//update user's list
+		const updatedUser = await User.findByIdAndUpdate(req.user.id, query, {
+			new: true,
+			runValidators: true,
+		});
+
+		//construct the item's updating query
+		let itemQuery;
+		if (isAdd) {
+			itemQuery = { $push: {} };
+			if (listType === "friend" || listType === "friendRequest") {
+				itemQuery.$push[itemListName] = req.receiverQuery || {
+					[listType]: updatedUser._id,
+					connection: {
+						status: "accepted",
+						timestamp: Date.now(),
+					},
+				};
+			} else {
+				itemQuery.$push[itemListName] = updatedUser._id;
+			}
+		} else {
+			itemQuery = { $pull: {} };
+			if (listType === "friend" || listType === "friendRequest") {
+				itemQuery.$pull[itemListName] = {
+					[listType]: updatedUser._id,
+				};
+			} else {
+				itemQuery.$pull[itemListName] = updatedUser._id;
+			}
+		}
+
+		//update item
 		const updatedItem = await model.findByIdAndUpdate(
 			itemExists._id,
 			itemQuery,
@@ -208,28 +237,30 @@ exports.addListItem = async function (req, res, next) {
 			}
 		);
 
-		//try creating notification for targer item
+		//if adding, try to create notification for target item
 		let notificationResponse;
-		try {
-			req.body.internalNotificationRequest = true;
-			//notification recieving user is: adminID for groups, ownerID for pages and request's body itemId for friends and friends requests
-			req.body.userID =
-				itemExists?.ownerID?.toString() ||
-				itemExists?.adminID?.toString() ||
-				itemId;
-			req.body.notificationType = notificationType;
-			req.body.initiatorType = notificationInitiatorType;
-			req.body.initiatorID = itemExists?._id.toString();
-			const results = await createNotification(req, res, next);
-			if (results.status === "success") {
-				notificationResponse = results;
+		if (isAdd) {
+			try {
+				req.body.internalNotificationRequest = true;
+				//notification recieving user is: adminID for groups, ownerID for pages and request's body itemId for friends and friends requests
+				req.body.userID =
+					itemExists?.ownerID?.toString() ||
+					itemExists?.adminID?.toString() ||
+					itemId;
+				req.body.notificationType = notificationType;
+				req.body.initiatorType = notificationInitiatorType;
+				req.body.initiatorID = itemExists?._id.toString();
+				const results = await createNotification(req, res, next);
+				if (results.status === "success") {
+					notificationResponse = results;
+				}
+			} catch (error) {
+				console.log(error);
+				notificationResponse = error;
 			}
-		} catch (error) {
-			console.log(error);
-			notificationResponse = error;
 		}
 
-		//send updated user to source
+		//send related results according to source
 		if (req.body.internalRequest) {
 			return {
 				status: "success",
@@ -256,109 +287,9 @@ exports.addListItem = async function (req, res, next) {
 		} else {
 			return next(
 				new AppError(
-					`Error adding item to user list: ${error.message}`,
-					error.statusCode || 500
-				)
-			);
-		}
-	}
-};
-
-//TODO: refactor this and addListItem as both functions are very similar
-//Remove item from user social list (friends, groups, pages, friendRequests)
-exports.removeListItem = async function (req, res, next) {
-	try {
-		const { list, itemId } = req.body;
-		const listType = list.slice(0, -5); //friend || group || page || friendRequest
-
-		let model;
-		let itemListName;
-		//validate list and initialize variables
-		switch (list) {
-			case "friendsList":
-				model = User;
-				itemListName = list;
-				break;
-			case "groupsList":
-				model = Group;
-				itemListName = "membersList";
-				break;
-			case "pagesList":
-				model = Page;
-				itemListName = "followersList";
-				break;
-			case "friendRequestsList":
-				model = User;
-				itemListName = list;
-				break;
-			default:
-				throw new AppError("Please provide a valid list property.", 400);
-		}
-
-		//check if item exists on database on supposed collection
-		const itemExists = await model.findById({ _id: itemId.toString() });
-		if (!itemExists) {
-			throw new AppError("Provided item does not exist on provided list.", 404);
-		}
-
-		//check if item exists on supposed list
-		if (
-			!req.user[list].some((item) => {
-				console.log(item[listType]);
-				console.log(listType);
-				return item[listType]?._id.toString() === itemId?.toString();
-			})
-		) {
-			throw new AppError("Item does not exists on that list the list.", 400);
-		}
-
-		//construct the query
-		const query = { $pull: {} };
-		query.$pull[list] = {
-			[listType]: itemExists._id,
-		};
-		//update user's list
-		const updatedUser = await User.findByIdAndUpdate(req.user.id, query, {
-			new: true,
-		});
-
-		const itemQuery = { $pull: {} };
-		if (listType === "friend" || listType === "friendRequest") {
-			itemQuery.$pull[itemListName] = {
-				[listType]: updatedUser._id,
-			};
-		} else {
-			itemQuery.$pull[itemListName] = updatedUser._id;
-		}
-
-		const updatedItem = await model.findByIdAndUpdate(
-			itemExists._id,
-			itemQuery,
-			{
-				new: true,
-			}
-		);
-
-		//send updated user to source
-		if (req.body.internalRequest) {
-			return {
-				status: "success",
-				data: { user: updatedUser, sourceItem: updatedItem },
-			};
-		} else {
-			res.status(200).json({
-				status: "success",
-				data: { user: updatedUser, sourceItem: updatedItem },
-			});
-		}
-	} catch (error) {
-		console.log(error);
-		if (req.body.internalRequest) {
-			throw error;
-		} else {
-			return next(
-				new AppError(
-					`Error removing item from user list: ${error.message}`,
+					`Error ${
+						isAdd ? "adding item to" : "removing item from"
+					} user list: ${error.message}`,
 					error.statusCode || 500
 				)
 			);
@@ -526,7 +457,7 @@ exports.sendFriendRequest = catchAsync(async function (req, res, next) {
 		req.receiverQuery = receivingUserQuery;
 
 		//add friend requests to both users lists
-		const response = await exports.addListItem(req, res, next);
+		const response = await exports.modifyListItem(req, res, next, true);
 
 		const updatedFriendRequestsList = response.data.user.friendRequestsList;
 
@@ -577,7 +508,7 @@ exports.rejectFriendRequest = catchAsync(async function (req, res, next) {
 		req.body.internalRequest = true;
 
 		//remove friend requests from both users lists
-		const response = await exports.removeListItem(req, res, next);
+		const response = await exports.modifyListItem(req, res, next, false);
 
 		const updatedFriendRequestsList = response.data.user.friendRequestsList;
 
@@ -628,12 +559,12 @@ exports.acceptFriendRequest = catchAsync(async function (req, res, next) {
 		req.body.internalRequest = true;
 
 		//add both users as friends
-		const response = await exports.addListItem(req, res, next);
+		const response = await exports.modifyListItem(req, res, next, true);
 
 		req.body.list = "friendRequestsList";
 
 		//remove friend requests from both users lists
-		const updatedResponse = await exports.removeListItem(req, res, next);
+		const updatedResponse = await exports.modifyListItem(req, res, next, false);
 
 		//populate friends list
 		const updatedFriendsList = await User.populate(

@@ -38,10 +38,10 @@ router.patch("/rejectFriendRequest/:id", userController.rejectFriendRequest);
 router.patch("/acceptFriendRequest/:id", userController.acceptFriendRequest);
 
 //Add item to chosen user's list
-router.patch("/addListItem", userController.addListItem);
+router.patch("/addListItem", userController.modifyListItem);
 
 //Remove item from chosen user's list
-router.patch("/removeListItem", userController.removeListItem);
+router.patch("/removeListItem", userController.modifyListItem);
 
 //Get user social suggestions (post because need to send data)
 router.post("/mySuggestions", userController.mySuggestions);

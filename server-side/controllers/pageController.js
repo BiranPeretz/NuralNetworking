@@ -3,7 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const filterObjProperties = require("../utils/filterObjProperties");
 const fetchNextBatch = require("../utils/fetchNextBatch");
-const { addListItem } = require("./userController");
+const { modifyListItem } = require("./userController");
 const { getAll, indexedTextSearch } = require("./CRUDOperations");
 const {
 	multerImageUpload,
@@ -95,7 +95,7 @@ exports.createPage = catchAsync(async function (req, res, next) {
 		req.body.itemId = page?._id;
 		req.body.internalRequest = true;
 
-		updateResponse = await addListItem(req, res, next);
+		updateResponse = await modifyListItem(req, res, next, true);
 	} catch (err) {
 		//linkage faield, delete created page
 		if (page) {
