@@ -343,7 +343,6 @@ exports.getSocialsList = catchAsync(async function (req, res, next) {
 });
 
 //Get user socials suggestions
-//TODO: add indexes (if possible) to 3 models that match this function's search
 exports.mySuggestions = catchAsync(async function (req, res, next) {
 	const { _id, friendsList, groupsList, pagesList, friendRequestsList } =
 		req.user;

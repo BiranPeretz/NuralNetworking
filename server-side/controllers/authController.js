@@ -16,7 +16,6 @@ const signToken = (id) => {
 };
 
 //Create auth token with defined user parameter and send detailed response with statusCode parameter
-//TODO: decide about cookie related code and if using or not
 const createSendToken = (user, statusCode, res) => {
 	const token = signToken(user._id);
 	const cookieOptions = {
