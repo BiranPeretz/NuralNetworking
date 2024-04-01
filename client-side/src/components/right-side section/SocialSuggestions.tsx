@@ -4,7 +4,6 @@ import Card from "../UI/Card";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { fetchSocialSuggestions } from "../../store/userThunks";
-import socialItemType from "../../types/socialItem";
 import SocialSuggestionItem from "./SocialSuggestionItem";
 import { addSuggestionItem } from "../../store/suggestionsThunks";
 import getToken from "../../util/getToken";
@@ -13,15 +12,19 @@ type Props = {
 	children?: React.ReactNode;
 };
 
+//top level component for social suggestions, contains suggestions card for each type (users/groups/pages) with appropriate list and header. also response for data fetch and manipulation
 const SocialSuggestions: React.FC<Props> = function (props) {
-	const token = getToken();
+	const token = getToken(); //JWT token
 	const { friends, groups, pages } = useSelector(
 		(state: RootState) => state.suggestions
-	);
-	const dispatch = useDispatch<AppDispatch>();
-	const hasRun = useRef<boolean>(false);
+	); // the store's 3 suggestion lists
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
+	const hasRun = useRef<boolean>(false); //for dev env
+
+	//fetch data from DB, execute once per app reload
 	useEffect(() => {
 		if (import.meta.env.PROD || !hasRun.current) {
+			//fetch suggestions for all 3 social types
 			dispatch(
 				fetchSocialSuggestions(token!, {
 					friends: friends?.removedSuggestions || [],
@@ -33,10 +36,12 @@ const SocialSuggestions: React.FC<Props> = function (props) {
 		hasRun.current = true; //For dev env
 	}, []);
 
+	//this function response for adding a suggestion to the user's appropriate list, handles store's state and DB update
 	const handleAddSuggestionItem = function (
-		list: "friendsList" | "groupsList" | "pagesList",
-		itemId: string,
+		list: "friendsList" | "groupsList" | "pagesList", //name of social list
+		itemId: string, //_id of suggestion item
 		removeSuggestionPayload: {
+			//payload object for store's suggestion slice update
 			collectionName: "friends" | "groups" | "pages";
 			_id: string;
 			doNotExclude?: boolean;
@@ -50,12 +55,6 @@ const SocialSuggestions: React.FC<Props> = function (props) {
 			})
 		);
 	};
-
-	const noItemsMessageEL = (
-		<h4 className={classes["no-items-msg"]}>
-			No items to suggest at this moment.
-		</h4>
-	);
 
 	return (
 		<div className={classes.suggestions}>

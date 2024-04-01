@@ -20,6 +20,7 @@ const verifyEmailSchema = resetPasswordSchema.pick({ token: true });
 
 type FormFields = z.infer<typeof verifyEmailSchema>;
 
+//form component for this app email verifing users process. takes varification token(that the user gets via Email) as input. successful submit change modal to either CreateProfileForm or ForgotPasswordForm, depends on previous forms the user came from
 const VerifyEmailForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -30,8 +31,10 @@ const VerifyEmailForm: React.FC<Props> = function (props) {
 		resolver: zodResolver(verifyEmailSchema),
 	});
 
+	//form's submit function, update user's email verification status to verified or display encountered errors
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//send email verify request
 			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + `users/verifyEmail/${data?.token}`,
 				{
@@ -39,17 +42,20 @@ const VerifyEmailForm: React.FC<Props> = function (props) {
 				}
 			);
 
-			const resultData = await result?.json();
+			const resultData = await result?.json(); //request's results data response
 
+			//evaluate request's response status
 			if (!(resultData?.status === "success")) {
 				throw new Error(resultData.message);
 			}
 
+			//if successful response, change modal to CreateProfileForm or ForgotPasswordForm, depends on what modal the user came from
 			props.changeModal(
 				props.originModalName === "signup" ? "createProfile" : "forgotPassword",
 				"verifyEmail"
 			);
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error resetting password.",
 			});

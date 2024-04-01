@@ -18,7 +18,7 @@ type Props = {
 	instanceType: "group" | "page";
 	closeModal: () => void;
 };
-
+//zod schema for the form
 const newInstanceSchema = z.object({
 	name: z
 		.string()
@@ -32,6 +32,7 @@ const newInstanceSchema = z.object({
 
 type FormFields = z.infer<typeof newInstanceSchema>;
 
+//create group/page form
 const NewSocialInstanceForm: React.FC<Props> = function ({
 	instanceType,
 	closeModal,
@@ -44,11 +45,11 @@ const NewSocialInstanceForm: React.FC<Props> = function ({
 	} = useForm<FormFields>({
 		resolver: zodResolver(newInstanceSchema),
 	});
-	const token = getToken();
-	const dispatch = useDispatch<AppDispatch>();
+	const token = getToken(); //JWT token
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 	const [displayFileUploader, setDisplayFileUploader] =
-		useState<boolean>(false);
-	const [imageFile, setImageFile] = useState<any>();
+		useState<boolean>(false); //control file uploading modal
+	const [imageFile, setImageFile] = useState<any>(); //the image uploaded to the form
 
 	const hideFileUploader = function () {
 		setDisplayFileUploader(false);
@@ -60,6 +61,7 @@ const NewSocialInstanceForm: React.FC<Props> = function ({
 
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//instance to create
 			const instanceItem: groupRequired | pageRequired = {
 				name: data?.name,
 				description: data?.description,
@@ -74,6 +76,7 @@ const NewSocialInstanceForm: React.FC<Props> = function ({
 
 			closeModal();
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error creating profile.",
 			});

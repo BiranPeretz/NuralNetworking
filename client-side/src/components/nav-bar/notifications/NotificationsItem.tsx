@@ -14,13 +14,16 @@ type Props = {
 	notificationItem: notificationType;
 };
 
+//item component for the notifications list, contains the notification data and mark as read button
 const NotificationsItem: React.FC<Props> = function (props) {
-	const token = getToken();
-	const dispatch = useDispatch<AppDispatch>();
+	const token = getToken(); //JWT token
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 	const [isRead, setIsRead] = useState<boolean | null>(
 		props.notificationItem.isRead
 	);
-	const message = getNotificationMessage(props.notificationItem);
+	const message = getNotificationMessage(props.notificationItem); //the notification message displayed to the user
+
+	//read notification button's handler function, handle both store state and DB read value
 	const readNotificationHandler = function () {
 		if (!isRead) {
 			dispatch(

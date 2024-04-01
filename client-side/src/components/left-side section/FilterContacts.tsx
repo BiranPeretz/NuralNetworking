@@ -14,13 +14,15 @@ type Props = {
 	) => void;
 };
 
+//filter contacts by the contact type (friends groups or pages), containing a button for each type. also fetch desired data from DB when needed
 const FilterContacts: React.FC<Props> = function (props) {
-	const dispatch = useDispatch<AppDispatch>();
-	const token = getToken();
-	const [activeButton, setActiveButton] = useState<HTMLElement | null>(null);
-	const friendsButtonRef = useRef<HTMLButtonElement | null>(null);
-	const hasFeched = useRef(false);
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
+	const token = getToken(); //JWT token
+	const [activeButton, setActiveButton] = useState<HTMLElement | null>(null); //currently active button
+	const friendsButtonRef = useRef<HTMLButtonElement | null>(null); //friends is the default contact type
+	const hasFeched = useRef(false); //boolean had initial fetch state, only used in dev env
 
+	//fetch contacts lists data from DB. executed once on mount
 	useEffect(() => {
 		setActiveButton(friendsButtonRef.current); //set frineds button as active
 		if (import.meta.env.PROD || !hasFeched.current) {
@@ -32,14 +34,17 @@ const FilterContacts: React.FC<Props> = function (props) {
 		hasFeched.current = true; //For dev env
 	}, []);
 
+	//update classList on active button change
 	useEffect(() => {
-		//toggle active button class for prev and current buttons clicked
+		//add "active" className to current button
 		activeButton?.classList?.add(classes.active);
 		return () => {
+			//remove "active" className from the same button right before next effect execution
 			activeButton?.classList?.remove(classes.active);
 		};
 	}, [activeButton]);
 
+	//this function handle the states changes when choosing different contacts list to display. takes the contacts list name and the mouse click event as parameters
 	const filterContactsHandler = function (
 		listName: string,
 		event: React.MouseEvent

@@ -9,16 +9,18 @@ import GroupsFeedPage from "./pages/feed-pages/GroupsFeed";
 import PagesFeedPage from "./pages/feed-pages/PagesFeed";
 import "simplebar-react/dist/simplebar.min.css";
 
+//react router DOM's router initialization
 const router = createBrowserRouter([
 	{
-		path: "/",
-		element: <RootLayout />,
-		errorElement: <ErrorPage />,
+		path: "/", //root path
+		element: <RootLayout />, //root layout component. applied to all childs
+		errorElement: <ErrorPage />, //the error page component
 		children: [
-			{ index: true, element: <WelcomePage /> },
+			//root's direct childs
+			{ index: true, element: <WelcomePage /> }, //the root or "home" page of the application
 			{
-				path: "feed",
-				element: <FeedLayout />,
+				path: "feed", //   "/feed"
+				element: <FeedLayout />, //feed's root page
 				children: [
 					{ index: true, element: <HomeFeedPage /> },
 					{ path: "friends", element: <FriendsFeedPage /> },
@@ -30,6 +32,7 @@ const router = createBrowserRouter([
 	},
 ]);
 
+//The App component that sets up the router context for the app.
 const App = function () {
 	return <RouterProvider router={router} />;
 };

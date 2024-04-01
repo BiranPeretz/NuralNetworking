@@ -7,7 +7,9 @@ type Props = {
 	setMenuDisplayState: (menuDisplayState: any) => any;
 };
 
+//component of the menu displayed on the notifications modal when there are no new notifications
 const NoNotificationsMenu: React.FC<Props> = function (props) {
+	//display (old) notifications menu button handler funnction
 	const displayOldNotificationsHandler = function () {
 		props.setMenuDisplayState(
 			(prevState: MenuDisplayStateType): MenuDisplayStateType => ({

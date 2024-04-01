@@ -10,11 +10,13 @@ type Props = {
 	setDisplayNotifications: (display: boolean) => void;
 };
 
+//the displaing state of the notification menus type
 export type MenuDisplayStateType = {
-	isNoNewNotifications: boolean;
-	oldNotificationsClick: boolean;
+	isNoNewNotifications: boolean; //has no non-read notifications
+	oldNotificationsClick: boolean; //show onld notifications button click state
 };
 
+//top level component for notifications, containing the notifications modal and control it's child component, could be the notifications menu or the no notifications menu
 const Notifications: React.FC<Props> = function ({
 	displayNotifications,
 	setDisplayNotifications,
@@ -33,6 +35,7 @@ const Notifications: React.FC<Props> = function ({
 		setDisplayNotifications(false);
 	};
 
+	//the function for notifications icon click when modal was hidden. get's the icon center coordinates and display notifications modal
 	const showNotifications = function (event: React.MouseEvent<SVGSVGElement>) {
 		const iconClicked = (event.target as SVGSVGElement).getBoundingClientRect();
 		const centerX = Math.round(iconClicked.left + iconClicked.width / 2);

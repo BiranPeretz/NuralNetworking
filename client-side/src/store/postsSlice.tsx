@@ -23,6 +23,7 @@ const postsSlice = createSlice({
 	name: "posts",
 	initialState,
 	reducers: {
+		//reset slice's state data
 		clearPostsData: function () {
 			const newState: stateType = {
 				posts: [],
@@ -33,10 +34,12 @@ const postsSlice = createSlice({
 			};
 			return newState;
 		},
+		//mark state as fetching posts
 		fetchPostsStart: function (state) {
 			state.isLoading = true;
 			state.error = null;
 		},
+		//for successful post fetching request results, set response data as current state and append new posts to old posts
 		fetchPostsSuccess: function (
 			state,
 			action: PayloadAction<{
@@ -51,6 +54,7 @@ const postsSlice = createSlice({
 				action.payload.lastItemTimestamp || state.lastItemTimestamp;
 			state.isLoading = false;
 		},
+		//for successful post creating request, reset error and isLoading state and append new post to posts array
 		createPostsSuccess: function (
 			state,
 			action: PayloadAction<{
@@ -65,6 +69,7 @@ const postsSlice = createSlice({
 			state.isLoading = false;
 			state.error = action.payload;
 		},
+		//set the like list of a post or comment to new value (mainly used to preform user like and unlike)
 		setLikeList: function (
 			state,
 			action: PayloadAction<{
@@ -91,6 +96,7 @@ const postsSlice = createSlice({
 				}
 			});
 		},
+		//takes ID of post and array of comments and set the array as new comments list for the post that match the ID
 		addPostComment: function (
 			state,
 			action: PayloadAction<{ postID: string; commentsList: commentType[] }>

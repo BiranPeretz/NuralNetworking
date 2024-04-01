@@ -1,8 +1,7 @@
-// import FriendsFeed from "../../components/feed/friends/FriendsFeed";
 import Feed from "../../components/feed/Feed";
 
+//uses the Feed component to create the friends feed page.
 const FriendsFeedPage = function () {
-	// return <FriendsFeed />;
 	return <Feed creatorType="User" feedType="friends" />;
 };
 

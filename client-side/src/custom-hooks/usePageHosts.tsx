@@ -2,19 +2,19 @@ import { useState, useEffect, useRef } from "react";
 import getToken from "../util/getToken";
 import socialItemType from "../types/socialItem";
 
+//this hook will request all user's owned pages and will return them as a array of social items. this could help the requesting component to understand the list of potential page hosts for the user (pages that the user can post on their behalf)
 export function usePageHosts() {
-	const token = getToken();
+	const token = getToken(); //JWT token
 	const [hosts, setHosts] = useState<socialItemType[] | undefined>(undefined);
-	const dataFetched = useRef<boolean>(false);
-
-	console.log("in usePageHosts");
+	const dataFetched = useRef<boolean>(false); //boolean flag to mark when data has been fetched
 
 	useEffect(() => {
-		console.log("in usePageHosts, in useEffect");
-
+		//only procceed if no data been fetched already
 		if (!dataFetched.current) {
+			//define data fetching function
 			const fetchPages = async () => {
 				try {
+					//request owned pages
 					const response = await fetch(
 						`${import.meta.env.VITE_SERVER_URL}pages/getMyPages`,
 						{
@@ -26,7 +26,9 @@ export function usePageHosts() {
 						}
 					);
 
+					//parse request's response
 					const data = await response.json();
+					//evaluate request's response status
 					if (!(data?.status === "success")) {
 						throw new Error(`client-error:${data.message}`);
 					}
@@ -38,6 +40,7 @@ export function usePageHosts() {
 				}
 			};
 
+			//call data fetching function
 			fetchPages();
 		}
 	}, []);

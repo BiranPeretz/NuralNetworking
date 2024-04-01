@@ -6,10 +6,11 @@ import ProfilePicture from "../../UI/ProfilePicture";
 import SocialInteractions from "./SocialInteractions";
 
 type Props = {
-	comment: commentType;
+	comment: commentType; //the comment to display
 	className?: string;
 };
 
+//comment on a post component
 const CommentItem: React.FC<Props> = function (props) {
 	const {
 		_id: commentID,
@@ -20,7 +21,7 @@ const CommentItem: React.FC<Props> = function (props) {
 		likeList,
 	} = props.comment;
 
-	const isParentComment = childCommentIDs && childCommentIDs?.length > 0;
+	const isParentComment = childCommentIDs && childCommentIDs?.length > 0; //if the comment has child comments
 
 	return (
 		<div className={`${classes["comment-wrapper"]} ${props?.className || ""}`}>

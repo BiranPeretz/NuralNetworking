@@ -5,6 +5,7 @@ import {
 } from "./userThunks";
 import { removeSuggestion } from "./suggestionsSlice";
 
+//this function will request to add a suggestion item(another user/group/page) to the user's corresponding list.
 export const addSuggestionItem = function (
 	token: string,
 	list: "friendsList" | "groupsList" | "pagesList",

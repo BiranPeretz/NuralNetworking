@@ -18,12 +18,13 @@ import ImageSuccess from "../../../assets/icons/ImageSuccess";
 
 type Props = {
 	creatorType: "User" | "Group" | "Page";
-	creatorID: socialItemType; //always the requesting user
+	creator: socialItemType; //always the requesting user
 	closeModal: () => void;
 	hostsArray?: socialItemType[];
 	children?: React.ReactNode;
 };
 
+//zod schema for the form
 const newPostSchema = z.object({
 	content: z
 		.string()
@@ -33,6 +34,7 @@ const newPostSchema = z.object({
 
 type FormFields = z.infer<typeof newPostSchema>;
 
+//the form for creating posts, takes text content and optional image
 const NewPostForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -43,17 +45,17 @@ const NewPostForm: React.FC<Props> = function (props) {
 		resolver: zodResolver(newPostSchema),
 	});
 
-	const token = getToken();
-	const dispatch = useDispatch<AppDispatch>();
-	const [displayEmojiPicker, setDisplayEmojiPicker] = useState<boolean>(false);
+	const token = getToken(); //JWT token
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
+	const [displayEmojiPicker, setDisplayEmojiPicker] = useState<boolean>(false); //emoji picker modal display state
 	const [displayFileUploader, setDisplayFileUploader] =
-		useState<boolean>(false);
-	const [imageFile, setImageFile] = useState<any>();
+		useState<boolean>(false); //file upload modal display state
+	const [imageFile, setImageFile] = useState<any>(); //uploaded image file
 	const [selectedOption, setSelectedOption] = useState<any>(undefined);
 	const contentRef = useRef<HTMLTextAreaElement>(null);
 	const hostID: socialItemType | undefined = props.hostsArray?.find(
 		(item) => item?._id === selectedOption?.value
-	);
+	); //the host item, either group or page
 
 	const hideFileUploader = function () {
 		setDisplayFileUploader(false);
@@ -65,11 +67,12 @@ const NewPostForm: React.FC<Props> = function (props) {
 
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//required data to create an post
 			const post: postRequired = {
 				content: { text: data?.content },
 				creatorType: hostID ? props.creatorType : "User",
-				creatorID: hostID?._id || props.creatorID._id,
-				author: hostID ? props.creatorID._id : undefined,
+				creatorID: hostID?._id || props.creator._id,
+				author: hostID ? props.creator._id : undefined,
 				image: imageFile || undefined,
 			};
 
@@ -78,12 +81,14 @@ const NewPostForm: React.FC<Props> = function (props) {
 			setDisplayEmojiPicker(false);
 			props.closeModal();
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error creating the post.",
 			});
 		}
 	};
 
+	//insert emojies to the end of the text
 	const addEmojiHandler = function (emoji: any) {
 		if (contentRef?.current) {
 			contentRef.current.value += emoji?.native || "";
@@ -102,8 +107,8 @@ const NewPostForm: React.FC<Props> = function (props) {
 				)}
 				<div className={classes["top-container"]}>
 					<PostHeader
-						creatorID={hostID || props.creatorID}
-						author={hostID ? props.creatorID : undefined}
+						creator={hostID || props.creator}
+						author={hostID ? props.creator : undefined}
 					/>{" "}
 					{props.creatorType !== "User" && (
 						<SocialItemSelect

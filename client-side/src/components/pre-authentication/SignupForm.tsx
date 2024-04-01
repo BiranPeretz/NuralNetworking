@@ -5,6 +5,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store/store";
 import userType from "../../types/user";
 import { authenticateUser } from "../../store/userSlice";
 import LabledInput from "../UI/LabledInput";
@@ -33,6 +34,7 @@ export const signupSchema = loginSchema.extend({
 
 type FormFields = z.infer<typeof signupSchema>;
 
+//form component for this app registration. inputs are email, password and password confirm. successful submit creates new user, authenticate him and change modal to VerifyEmailForm
 const SignupForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -43,14 +45,17 @@ const SignupForm: React.FC<Props> = function (props) {
 		resolver: zodResolver(signupSchema),
 	});
 
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 
+	//form's submit function, creates new user instance with provided data and authenticates user or display encountered errors
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//validate provided password equal passwordConfirm or throw an error
 			if (!(data?.password === data?.passwordConfirm)) {
 				throw new Error("Password confirmation does not match password.");
 			}
 
+			//send sign up request
 			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + "users/signup",
 				{
@@ -60,8 +65,9 @@ const SignupForm: React.FC<Props> = function (props) {
 				}
 			);
 
-			const resultData = await result?.json();
+			const resultData = await result?.json(); //request's results data response
 
+			//evaluate request's response status
 			if (!(resultData?.status === "success")) {
 				throw new Error(resultData.message);
 			}
@@ -69,6 +75,7 @@ const SignupForm: React.FC<Props> = function (props) {
 			//store JWT token in local storage
 			localStorage.setItem("token", resultData?.token);
 
+			//user's data initialization for store's state
 			const user: userType = {
 				_id: resultData?.data?.user?._id,
 				email: resultData?.data?.user?.email,
@@ -78,9 +85,11 @@ const SignupForm: React.FC<Props> = function (props) {
 				friendRequestsList: [],
 			};
 
+			//authenticate user with store's data ocject and change modal to SendVerificationForm
 			dispatch(authenticateUser(user));
 			props.changeModal("sendVerification", "signup");
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error signing up.",
 			});

@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
+		{/*makes redux store available application-wide*/}
 		<Provider store={store}>
 			<App />
 		</Provider>

@@ -2,6 +2,7 @@ import React from "react";
 import classes from "./Error.module.css";
 import { useRouteError, isRouteErrorResponse } from "react-router-dom";
 
+//TODO: change component and design for less default look
 const ErrorPage: React.FC = function () {
 	const error = useRouteError();
 	let errorMessage: string;

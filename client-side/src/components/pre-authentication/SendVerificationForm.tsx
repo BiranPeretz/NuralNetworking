@@ -20,6 +20,7 @@ const sendVerificationSchema = loginSchema.pick({ email: true });
 
 type FormFields = z.infer<typeof sendVerificationSchema>;
 
+//form component for sending verification Emails, takes email as input and change modal to VerifyEmailForm on successful input
 const SendVerificationForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -30,8 +31,10 @@ const SendVerificationForm: React.FC<Props> = function (props) {
 		resolver: zodResolver(sendVerificationSchema),
 	});
 
+	//form's submit function, sends email with verification token or display encountered errors
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//send verification email sending request
 			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + "users/sendVerificationEmail",
 				{
@@ -41,13 +44,16 @@ const SendVerificationForm: React.FC<Props> = function (props) {
 				}
 			);
 
-			const resultData = await result?.json();
+			const resultData = await result?.json(); //request's results data response
+			//evaluate request's response status
 			if (!(resultData?.status === "success")) {
 				throw new Error(resultData.message);
 			}
 
+			//change modal to VerifyEmailForm
 			props.changeModal("verifyEmail", props.originModalName);
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error sending reset email.",
 			});

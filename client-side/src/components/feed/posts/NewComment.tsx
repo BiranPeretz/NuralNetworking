@@ -13,9 +13,10 @@ type Props = {
 	setDisplayNewComment: (__: boolean) => void;
 };
 
+//the component that the user is using while writing new comment, contain the commenting user's profile picture, text-box and send button
 const NewComment: React.FC<Props> = function (props) {
-	const token = getToken();
-	const dispatch = useDispatch<AppDispatch>();
+	const token = getToken(); //JWT token
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 	const commentRef = useRef<HTMLInputElement>(null);
 
 	const addNewCommentHandler = function () {

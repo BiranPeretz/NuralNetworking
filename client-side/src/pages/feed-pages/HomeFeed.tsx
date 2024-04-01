@@ -1,10 +1,8 @@
-//import classes from './HomeFeedPage.module.css'
-// import HomeFeed from "../../components/feed/home/HomeFeed";
 import Feed from "../../components/feed/Feed";
 
+//uses the Feed component to create the home feed page.
 const HomeFeedPage = function () {
 	return <Feed creatorType="User" />;
-	// return <HomeFeed />;
 };
 
 export default HomeFeedPage;

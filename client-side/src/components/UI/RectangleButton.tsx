@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import classes from "./RectangleButton.module.css";
 
 type Props = {
@@ -12,13 +12,14 @@ type Props = {
 	onClick?: () => void;
 };
 
+//generic component for styled button in the app. replace the html button tag with custom rectangle button and some pre-made css styles
 const RectangleButton: React.FC<Props> = function (props) {
 	return (
 		<button
 			id={props.id}
 			name={props.name}
 			type={props.type}
-			value={props.type}
+			value={props.value}
 			className={`${classes.container} ${props.className || ""}`}
 			style={props.style}
 			onClick={props.onClick}

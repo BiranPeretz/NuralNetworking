@@ -1,9 +1,10 @@
 import classes from "./NavButton.module.css";
 import { Link } from "react-router-dom";
 
+//custom button replacment component for the navigation bar feed buttons
 const NavButton: React.FC<{
 	icon: React.ReactNode;
-	to: string;
+	to: string; //relative url
 	isActive?: boolean;
 }> = function (props) {
 	return (

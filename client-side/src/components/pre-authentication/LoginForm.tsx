@@ -4,6 +4,7 @@ import { Form, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store/store";
 import userType from "../../types/user";
 import { authenticateUser } from "../../store/userSlice";
 import LabledInput from "../UI/LabledInput";
@@ -18,6 +19,7 @@ type Props = {
 	originModalName?: PreAuthModalsNames;
 };
 
+//zod schema for the form
 export const loginSchema = z.object({
 	email: z
 		.string()
@@ -32,6 +34,7 @@ export const loginSchema = z.object({
 
 type FormFields = z.infer<typeof loginSchema>;
 
+//form component of app's login. cradentials are email and password. successful submit either authenticate user and navigate to feed, or, change modal to CreateProfileForm if the user haven't created he's profile
 const LoginForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -43,10 +46,12 @@ const LoginForm: React.FC<Props> = function (props) {
 	});
 
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 
+	//form's submit function, sends login request to server and authenticates user or display encountered errors
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//send login request
 			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + "users/login",
 				{
@@ -56,7 +61,8 @@ const LoginForm: React.FC<Props> = function (props) {
 				}
 			);
 
-			const resultData = await result?.json();
+			const resultData = await result?.json(); //request's results data response
+			//evaluate request's response status
 			if (!(resultData?.status === "success")) {
 				throw new Error(resultData.message);
 			}
@@ -64,6 +70,7 @@ const LoginForm: React.FC<Props> = function (props) {
 			//store JWT token in local storage
 			localStorage.setItem("token", resultData?.token);
 
+			//user's data initialization for store's state
 			const user: userType = {
 				_id: resultData?.data?.user?._id,
 				email: resultData?.data?.user?.email,
@@ -73,20 +80,24 @@ const LoginForm: React.FC<Props> = function (props) {
 				friendRequestsList: [],
 			};
 
+			//check if user haven't completed profile creation process
 			if (!resultData?.data?.user?.fullName) {
-				dispatch(authenticateUser(user));
-				props.changeModal("createProfile", "login");
+				dispatch(authenticateUser(user)); //authenticate user in store's state
+				props.changeModal("createProfile", "login"); //change modal to CreateProfileForm
 				return;
 			}
 
+			//if user have a profile, append its data
 			user.fullName = resultData?.data?.user?.fullName;
 			user.profilePicture = resultData?.data?.user?.profilePicture;
 			user.about = resultData?.data?.user?.about;
 			user.verifiedEmail = resultData?.data?.user?.verifiedEmail;
 
+			//authenticate user with store's data ocject and navigate to Feed
 			dispatch(authenticateUser(user));
 			navigate("/feed");
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error logging in.",
 			});

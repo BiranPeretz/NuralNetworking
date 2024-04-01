@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type userType from "../types/user";
-import socialItemType from "../types/socialItem";
 import {
 	friendConnectionType,
 	groupConnectionType,
@@ -23,33 +22,39 @@ export const userSlice = createSlice({
 	name: "user",
 	initialState,
 	reducers: {
+		//takes an user as parameter and set it's data as the current state
 		authenticateUser: function (state, action: PayloadAction<userType>) {
 			const { _id, email } = action.payload;
-			const token = getToken();
+			const token = getToken(); //JWT token
 			if (!_id || !token || !email) {
 				return state;
 			}
 
 			return action.payload;
 		},
+		//takes an user as parameter and set it's profile related data as current state
 		createProfile: function (state, action: PayloadAction<userType>) {
 			state.fullName = action.payload.fullName;
 			state.profilePicture = action.payload.profilePicture;
 			state.about = action.payload.about;
 			state.verifiedEmail = action.payload.verifiedEmail;
 		},
+		//takes a friend connection object and add it to user's friends list
 		addFriends: function (
 			state,
 			action: PayloadAction<friendConnectionType[]>
 		) {
 			state.friendsList = [...action.payload, ...state.friendsList];
 		},
+		//takes a group connection object and add it to user's groups list
 		addGroups: function (state, action: PayloadAction<groupConnectionType[]>) {
 			state.groupsList = [...action.payload, ...state.groupsList];
 		},
+		//takes a page connection object and add it to user's pages list
 		addPages: function (state, action: PayloadAction<pageConnectionType[]>) {
 			state.pagesList = [...action.payload, ...state.pagesList];
 		},
+		//takes friend request object as parameter and add it to user's frined requests list
 		addFriendRequests: function (
 			state,
 			action: PayloadAction<friendRequestType[]>
@@ -59,6 +64,7 @@ export const userSlice = createSlice({
 				...state.friendRequestsList,
 			];
 		},
+		//takes name string of a list and array of any of the lists items and set state's list according to those parameters
 		setSocialList: function (
 			state,
 			action: PayloadAction<{
@@ -97,6 +103,7 @@ export const userSlice = createSlice({
 					);
 			}
 		},
+		//takes name string of a list and an item ID to remove matching item
 		removeSocialItem: function (
 			state,
 			action: PayloadAction<{
@@ -119,6 +126,7 @@ export const userSlice = createSlice({
 
 			state[`${listName}`] = newList;
 		},
+		//reset slice's state data
 		clearUserData: function () {
 			const newState: userType = {
 				_id: null,

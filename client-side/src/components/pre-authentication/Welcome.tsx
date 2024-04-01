@@ -13,6 +13,7 @@ import ResetPasswordForm from "./ResetPasswordForm";
 import SendVerificationForm from "./SendVerificationForm";
 import VerifyEmailForm from "./VerifyEmailForm";
 
+//this type holds all possible pre-authentication modal's forms as their string name
 export type PreAuthModalsNames =
 	| "login"
 	| "signup"
@@ -26,16 +27,17 @@ type Props = {
 	children?: React.ReactNode;
 };
 
+//the component for the welcome page. this page contains all the page content and manage the changes between all pre-authentication modal forms (login, password related, etc.) and the display state of the modal. contains a nav-bar with login/signup buttons and the app's logo, the app's hero text, a background image and a footer
 const Welcome: React.FC<Props> = function (props) {
 	const [modalState, setModalState] = useState<{
-		display: boolean;
-		title: string;
-		child: React.ReactNode;
+		display: boolean; //boolean display state of the modal
+		title: string; //the title displayed in the modal
+		child: React.ReactNode; //the form component (one of the PreAuthModalsNames)
 	}>({
 		display: false,
 		title: "",
 		child: null,
-	});
+	}); //state object for the modal of the pre-auth form components
 
 	const closeModalHandler = function () {
 		setModalState((prevState) => {
@@ -43,12 +45,14 @@ const Welcome: React.FC<Props> = function (props) {
 		});
 	};
 
+	//this function set the modal's display state to true and handle modal changes logic
 	const displayModalHandler = function (
-		modalName: PreAuthModalsNames,
-		sourceModalName?: PreAuthModalsNames
+		modalName: PreAuthModalsNames, //name of the new form to display
+		sourceModalName?: PreAuthModalsNames //name of the form that requested this change
 	) {
 		closeModalHandler();
 
+		//switch the modalName parameter and change all modal's state properties accordinally
 		switch (modalName) {
 			case "login":
 				setModalState({

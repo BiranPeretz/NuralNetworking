@@ -6,14 +6,15 @@ import Backdrop from "./Backdrop";
 import CloseX from "../../assets/icons/CloseX";
 
 type Props = {
-	className?: string;
-	backdropClassName?: string;
+	className?: string; //additional className atribute
+	backdropClassName?: string; //additionall passed to the Backdrop component
 	children?: React.ReactNode;
-	title?: string;
-	style?: CSSProperties;
+	title?: string; //text to display as the modal's header
+	style?: CSSProperties; //additionall css style attribute
 	onClose: () => void;
 };
 
+//generic modal component for this app. tipically renered on dedicated root html tag via portal, also display a Backdrop component to blur the rest of the content. has premade css classes and this component is commonly used in the app. the modal's content is contained within a Card component and has dedicated custom title
 const Modal: React.FC<Props> = function (props) {
 	return (
 		<Fragment>

@@ -5,11 +5,12 @@ import Backdrop from "../../UI/Backdrop";
 import Card from "../../UI/Card";
 
 type Props = {
-	positionCoords: { x: number; y: number };
+	positionCoords: { x: number; y: number }; //the center coordinates of the notifications icon
 	onClose: () => void;
 	children?: React.ReactNode;
 };
 
+//custom modal component for notifications, displays a backdrop and one of the notification menus appropriately
 const NotificationsModal: React.FC<Props> = function (props) {
 	return (
 		<Fragment>

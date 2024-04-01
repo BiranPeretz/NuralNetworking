@@ -5,8 +5,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../store/store";
 import { createProfile } from "../../store/userSlice";
-import { RootState } from "../../store/store";
 import LabledInput from "../UI/LabledInput";
 import getToken from "../../util/getToken";
 import useLogout from "../../custom-hooks/useLogout";
@@ -21,6 +21,7 @@ type Props = {
 	originModalName?: PreAuthModalsNames;
 };
 
+//zod schema for the form
 const createProfileSchema = z.object({
 	fullName: z
 		.string()
@@ -38,6 +39,7 @@ const createProfileSchema = z.object({
 
 type FormFields = z.infer<typeof createProfileSchema>;
 
+//form component for this app's user profile creation. inputs are full name, self description (optional), and profile picture(optional). updates user's profile data and navigate user to feed on successful submit.
 const CreateProfileForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -49,32 +51,36 @@ const CreateProfileForm: React.FC<Props> = function (props) {
 	});
 
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
-	const logout = useLogout();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
+	const logout = useLogout(); //application's logout hook, execute logout functionality when called
 	const { email } = useSelector((state: RootState) => state.user);
-	const token = getToken();
+	const token = getToken(); //JWT token
 	const [displayFileUploader, setDisplayFileUploader] =
 		useState<boolean>(false);
 	const [imageFile, setImageFile] = useState<any>();
 
+	//hides the file upload modal
 	const hideFileUploader = function () {
 		setDisplayFileUploader(false);
 	};
 
+	//shows the file upload modal
 	const showFileUploader = function () {
 		setDisplayFileUploader(true);
 	};
 
+	//function for the "not me" button, log out the user and close the modal
 	const notMeHandler = function (event: React.MouseEvent) {
 		event.preventDefault();
 		props.onCloseModal();
 		logout();
 	};
 
+	//form's submit function, creates the profile with provided data and navigates user to feed or display encountered errors
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//initialize formData
 			const formData = new FormData();
-
 			formData.append("fullName", data?.fullName);
 			if (data?.about) {
 				formData.append("about", data?.about);
@@ -83,6 +89,7 @@ const CreateProfileForm: React.FC<Props> = function (props) {
 				formData.append("image", imageFile);
 			}
 
+			//send profile creating request
 			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + "users/CreateProfile",
 				{
@@ -94,15 +101,19 @@ const CreateProfileForm: React.FC<Props> = function (props) {
 				}
 			);
 
-			const resultData = await result?.json();
+			const resultData = await result?.json(); //request's results data response
 
+			//evaluate request's response status
 			if (!(resultData?.status === "success")) {
 				throw new Error(resultData.message);
 			}
 
+			//update user's profile related data on store state
 			dispatch(createProfile(resultData.data.user));
+
 			navigate("/feed");
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error creating profile.",
 			});

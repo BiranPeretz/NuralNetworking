@@ -16,11 +16,12 @@ type Props = {
 	feedType?: "friends" | "groups" | "pages";
 };
 
+//Top level feed component, container of posts, there are 4 types of feed
 const Feed: React.FC<Props> = function ({ creatorType, feedType }) {
 	const scrollRef = useRef<any>();
 	const isFetching = useRef(false);
 	const hasRun = useRef(false); //For dev env
-	const token = getToken();
+	const token = getToken(); //JWT token
 	const {
 		_id: userID,
 		fullName: userName,
@@ -29,17 +30,20 @@ const Feed: React.FC<Props> = function ({ creatorType, feedType }) {
 	const { posts, lastItemTimestamp, isNoMoreItems, isLoading } = useSelector(
 		(state: RootState) => state.post
 	);
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 
+	//run once on mount
 	useEffect(() => {
 		if (import.meta.env.PROD || !hasRun.current) {
 			dispatch(
+				//fetch feed posts, save in store
 				fetchPosts("user-related", token!, false, undefined, true, feedType)
 			);
 		}
 		hasRun.current = true; //For dev env
 	}, []);
 
+	//infinite scrolling logic
 	useEffect(() => {
 		const simpleBarInstance = scrollRef.current.getScrollElement();
 		const threshold = 350;
@@ -48,6 +52,7 @@ const Feed: React.FC<Props> = function ({ creatorType, feedType }) {
 			if (!isFetching.current) {
 				const { scrollTop, scrollHeight, clientHeight } = simpleBarInstance;
 
+				//if bottom treashold reached, fetch more posts
 				if (scrollTop + clientHeight >= scrollHeight - threshold) {
 					isFetching.current = true;
 
@@ -66,8 +71,8 @@ const Feed: React.FC<Props> = function ({ creatorType, feedType }) {
 								`ERROR fetching infinite scroll next batch: ${err.message}`
 							)
 						)
+						//set 200ms cooldown between executions
 						.finally(() => {
-							// re-add scroll listener
 							setTimeout(() => {
 								isFetching.current = false;
 							}, 200);
@@ -76,6 +81,7 @@ const Feed: React.FC<Props> = function ({ creatorType, feedType }) {
 			}
 		};
 
+		// re-add scroll listener
 		simpleBarInstance.addEventListener("scroll", handleScroll);
 		return () => simpleBarInstance.removeEventListener("scroll", handleScroll);
 	}, [scrollRef, lastItemTimestamp]);
@@ -98,7 +104,7 @@ const Feed: React.FC<Props> = function ({ creatorType, feedType }) {
 				<div className={classes["action-buttons"]}>
 					<NewPost
 						creatorType={creatorType}
-						creatorID={{
+						creator={{
 							_id: userID,
 							name: userName!,
 							profilePicture: userProfilePicture,

@@ -20,6 +20,7 @@ const forgotPasswordSchema = loginSchema.pick({ email: true });
 
 type FormFields = z.infer<typeof forgotPasswordSchema>;
 
+//form component for users that forgot their password, available only for users with verified email. takes email as input. successful submit either sends appropriate email and change modal to PasswordResetForm(if email is varified) or change modal to SendVerificationForm (for unverified users)
 const ForgotPasswordForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -30,8 +31,10 @@ const ForgotPasswordForm: React.FC<Props> = function (props) {
 		resolver: zodResolver(forgotPasswordSchema),
 	});
 
+	//form's submit function, sends Email with password reset token or display encountered errors
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//send forgot password request
 			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + "users/forgotPassword",
 				{
@@ -41,19 +44,23 @@ const ForgotPasswordForm: React.FC<Props> = function (props) {
 				}
 			);
 
-			const resultData = await result?.json();
+			const resultData = await result?.json(); //request's results data response
+			//evaluate request's response status
 			if (!(resultData?.status === "success")) {
 				if (
 					resultData?.error?.statusCode &&
 					resultData?.error?.statusCode === 403
 				) {
-					return props.changeModal("sendVerification", "forgotPassword");
+					//recieved forbidden error code which indicated unverified email in this case
+					return props.changeModal("sendVerification", "forgotPassword"); //change modal to SendVerificationForm
 				}
 				throw new Error(resultData.message);
 			}
 
+			//verification email has been sent successfuly, change modal to PasswordResetForm
 			props.changeModal("resetPassword", "forgotPassword");
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error sending reset email.",
 			});

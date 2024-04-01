@@ -1,25 +1,26 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store/store";
 import { clearUserData } from "../store/userSlice";
 import { clearPostsData } from "../store/postsSlice";
 import { clearSuggestionsData } from "../store/suggestionsSlice";
 
-//this hook cluster required hooks to enable user logout
+//custom hook that cluster required actions to preform user logout in this application
 const useLogout = function () {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 	const navigate = useNavigate();
 
-	//this function preform the logout operations
+	//the function that preform the logout operations
 	const logout = function () {
-		//step 1: remove authentication token from local storage
+		//remove authentication token from local storage
 		localStorage.removeItem("token");
 
-		//step 2: reset redux store data to initial values
+		//reset the entire store data
 		dispatch(clearUserData());
 		dispatch(clearPostsData());
 		dispatch(clearSuggestionsData());
 
-		//step 3: redirect the user to welcome screen
+		//redirect the user to welcome screen
 		navigate("/");
 	};
 

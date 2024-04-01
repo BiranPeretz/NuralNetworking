@@ -1,9 +1,7 @@
-//import classes from './GroupsFeedPage.module.css'
-// import GroupsFeed from "../../components/feed/groups/GroupsFeed";
 import Feed from "../../components/feed/Feed";
 
+//uses the Feed component to create the groups feed page.
 const GroupsFeedPage = function () {
-	// return <GroupsFeed />;
 	return <Feed creatorType="Group" feedType="groups" />;
 };
 

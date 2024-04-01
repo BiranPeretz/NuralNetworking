@@ -11,19 +11,19 @@ import ProfilePicture from "../../UI/ProfilePicture";
 
 type Props = {
 	creatorType: "User" | "Group" | "Page";
-	creatorID: socialItemType;
+	creator: socialItemType;
 };
-
+//create new post button component of the feed
 const NewPost: React.FC<Props> = function (props) {
 	const [displayModal, setDisplayModal] = useState(false);
 
-	let hostsArray;
+	let hostsArray; //array of available hosts. host = where the post is posted. host is either group or page
 
 	if (props.creatorType !== "User") {
 		if (props.creatorType === "Group") {
-			hostsArray = useGroupHosts();
+			hostsArray = useGroupHosts(); //groups the user participate in
 		} else if (props.creatorType === "Page") {
-			hostsArray = usePageHosts();
+			hostsArray = usePageHosts(); //pages owned by the user
 		}
 	}
 
@@ -50,7 +50,7 @@ const NewPost: React.FC<Props> = function (props) {
 					<Modal title="Create new post" onClose={closeModalHandler}>
 						<NewPostForm
 							creatorType={props.creatorType}
-							creatorID={props.creatorID}
+							creator={props.creator}
 							closeModal={closeModalHandler}
 							hostsArray={hostsArray}
 						/>

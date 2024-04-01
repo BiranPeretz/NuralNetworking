@@ -5,6 +5,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store/store";
 import userType from "../../types/user";
 import { authenticateUser } from "../../store/userSlice";
 import LabledInput from "../UI/LabledInput";
@@ -30,6 +31,7 @@ export const resetPasswordSchema = signupSchema.omit({ email: true }).merge(
 
 type FormFields = z.infer<typeof resetPasswordSchema>;
 
+//form component for this app password reset. inputs are password reset token(that the user gets via Email), new password and new password confirmation. successful submit either authenticate user and navigate to feed, or, change modal to CreateProfileForm if the user haven't created hes profile
 const ResetPasswordForm: React.FC<Props> = function (props) {
 	const {
 		register,
@@ -41,14 +43,17 @@ const ResetPasswordForm: React.FC<Props> = function (props) {
 	});
 
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 
+	//form's submit function, reset password with provided data and authenticates user or display encountered errors
 	const onSubmit: SubmitHandler<FormFields> = async function (data) {
 		try {
+			//validate provided password equal passwordConfirm or throw an error
 			if (!(data?.password === data?.passwordConfirm)) {
 				throw new Error("Password confirmation does not match password.");
 			}
 
+			//send password reset request
 			const result = await fetch(
 				import.meta.env.VITE_SERVER_URL + `users/resetPassword/${data?.token}`,
 				{
@@ -58,8 +63,9 @@ const ResetPasswordForm: React.FC<Props> = function (props) {
 				}
 			);
 
-			const resultData = await result?.json();
+			const resultData = await result?.json(); //request's results data response
 
+			//evaluate request's response status
 			if (!(resultData?.status === "success")) {
 				throw new Error(resultData.message);
 			}
@@ -67,6 +73,7 @@ const ResetPasswordForm: React.FC<Props> = function (props) {
 			//store JWT token in local storage
 			localStorage.setItem("token", resultData?.token);
 
+			//user's data initialization for store's state
 			const user: userType = {
 				_id: resultData?.data?.user?._id,
 				email: resultData?.data?.user?.email,
@@ -76,20 +83,24 @@ const ResetPasswordForm: React.FC<Props> = function (props) {
 				friendRequestsList: [],
 			};
 
+			//check if user haven't completed profile creation process
 			if (!resultData?.data?.user?.fullName) {
-				dispatch(authenticateUser(user));
-				props.changeModal("createProfile", "resetPassword");
+				dispatch(authenticateUser(user)); //authenticate user in store's state
+				props.changeModal("createProfile", "resetPassword"); //change modal to CreateProfileForm
 				return;
 			}
 
+			//if user have a profile, append its data
 			user.fullName = resultData?.data?.user?.fullName;
 			user.profilePicture = resultData?.data?.user?.profilePicture;
 			user.about = resultData?.data?.user?.about;
 			user.verifiedEmail = resultData?.data?.user?.verifiedEmail;
 
+			//authenticate user with store's data ocject and navigate to Feed
 			dispatch(authenticateUser(user));
 			navigate("/feed");
 		} catch (error) {
+			//caught an error, display it's message to the user
 			setError("root", {
 				message: (error as Error)?.message || "Error resetting password.",
 			});

@@ -3,16 +3,18 @@ import classes from "./SocialItem.module.css";
 import ProfilePicture from "./ProfilePicture";
 
 type Props = {
-	name: string;
-	NameClassname?: string;
-	subText?: string;
-	subTextClassnameS?: string;
-	pictureClassName?: string;
-	pictureSrc?: string;
-	pictureAlt?: string;
-	picturStyle?: Object;
-	children?: React.ReactNode;
+	name: string; //name of the item, displayed as an h3 header tag
+	NameClassname?: string; //additional name's h3 tag className attribute
+	subText?: string; //displayed as h5 tag, text is displayed below name with lighter color
+	subTextClassnameS?: string; //additional sub-text's h5 tag className attribute
+	pictureClassName?: string; //attitional className attribute for the profile picture img tag
+	pictureSrc?: string; //img's src attribute
+	pictureAlt?: string; //img's alt attribute
+	picturStyle?: Object; //additional styles for the img tag
+	children?: React.ReactNode; //child component to display at the end(right-most) of the component
 };
+
+//generic component to display this app's social items(users groups and pages) as horizontal list item. contain the item's profile picture, name and optional sub-text to display below the name. could also have child components to be used in conjunction like action buttons, more data, etc. mostly used as a list item but could be standalone header or something else
 const SocialItem: React.FC<Props> = function (props) {
 	return (
 		<Fragment>

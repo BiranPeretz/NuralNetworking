@@ -9,6 +9,7 @@ type Props = {
 	instanceType: "group" | "page";
 };
 
+//generic create group/page button, displayed for the groups/pages feed
 const NewSocialInstance: React.FC<Props> = function ({ instanceType }) {
 	const [displayModal, setDisplayModal] = useState(false);
 

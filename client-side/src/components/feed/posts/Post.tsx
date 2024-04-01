@@ -11,17 +11,18 @@ type Props = {
 	children?: React.ReactNode;
 };
 
+//top level component of a post. diplay a card containing the sub-post components
 const Post: React.FC<Props> = function (props) {
 	const { _id, content, creatorID, author, timestamp, likeList, commentsList } =
 		props.post;
 
-	const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
-	const [isImageError, setIsImageError] = useState<boolean>(false);
+	const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false); //post's image loading state
+	const [isImageError, setIsImageError] = useState<boolean>(false); //post's image error state
 
 	return (
 		<Card className={classes.post}>
 			<PostHeader
-				creatorID={creatorID!}
+				creator={creatorID!}
 				author={author}
 				postTimestamp={timestamp}
 			/>

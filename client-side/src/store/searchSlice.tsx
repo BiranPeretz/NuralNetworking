@@ -4,6 +4,7 @@ import socialItemType from "../types/socialItem";
 
 type socialType = "user" | "group" | "page";
 
+//singular socail category state type
 export type SearchCategoryType = {
 	isNoMoreItems: boolean;
 	page: number;
@@ -18,6 +19,7 @@ const initSearchCategory: SearchCategoryType = {
 	results: [],
 };
 
+//all 3 social types global search state type
 export type stateType = {
 	user: {
 		categoryState: SearchCategoryType;
@@ -60,6 +62,7 @@ const searchSlice = createSlice({
 	name: "search",
 	initialState,
 	reducers: {
+		//reset slice's state data
 		clearSearchData: function () {
 			const newState: stateType = {
 				user: {
@@ -96,6 +99,7 @@ const searchSlice = createSlice({
 			};
 			return newState;
 		},
+		//takes value for isLoading and optionally the social type to set, default is to set all 3 social types isLoading to provided value
 		setIsLoading: function (
 			state,
 			action: PayloadAction<{ value: boolean; socialType?: socialType }>
@@ -143,6 +147,7 @@ const searchSlice = createSlice({
 
 			state[socialType].categoryState = value;
 		},
+		//append next page of search results
 		addCategoryStateBatch: function (
 			state,
 			action: PayloadAction<{
@@ -160,6 +165,7 @@ const searchSlice = createSlice({
 
 			state[socialType].categoryState = newCategoryState;
 		},
+		//set the value for one singular category search result
 		setCategoryResults: function (
 			state,
 			action: PayloadAction<{
@@ -182,17 +188,6 @@ const searchSlice = createSlice({
 
 			state[socialType].categoryState.page = value;
 		},
-		nextCategoryPage: function (
-			state,
-			action: PayloadAction<{
-				socialType: socialType;
-			}>
-		) {
-			const { socialType } = action.payload;
-
-			state[socialType].categoryState.page =
-				state[socialType].categoryState.page + 1;
-		},
 	},
 });
 
@@ -205,6 +200,5 @@ export const {
 	addCategoryStateBatch,
 	setCategoryResults,
 	setCategoryPage,
-	nextCategoryPage,
 } = searchSlice.actions;
 export default searchSlice.reducer;

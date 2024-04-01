@@ -11,17 +11,19 @@ import { FadeLoader } from "react-spinners";
 
 type Props = {
 	socialType: "user" | "group" | "page";
-	searchString: string;
+	searchString: string; //the string value used for the search
 };
 
+//single category(users/groups/pages) search resunlts card component, contains the list of initially fetched results for its category, category name and fetch next results batch button
 const SearchResults: React.FC<Props> = function ({ socialType, searchString }) {
-	const dispatch = useDispatch<AppDispatch>();
-	const token = getToken();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
+	const token = getToken(); //JWT token
 	const { categoryState, isLoading, error } = useSelector(
 		(state: RootState) => state.search[socialType]
 	);
 	const { isNoMoreItems, page, limit, results } = categoryState;
 
+	//this function fetch the next batch of results from DB
 	const fetchNextBatch = function () {
 		if (isNoMoreItems) {
 			return;

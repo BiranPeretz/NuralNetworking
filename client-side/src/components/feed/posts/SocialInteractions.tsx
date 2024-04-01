@@ -16,13 +16,14 @@ import getTotalCommentsCount from "../../../util/getTotalCommentsCount";
 type Props = {
 	itemID: string;
 	likeList: likeType[];
-	commentList: commentType[];
+	commentList: commentType[]; //post's comments or child comments of a comment
 	model: "posts" | "comments";
-	containerClassname?: string;
-	interactionClassname?: string;
-	engagementsClassname?: string;
+	containerClassname?: string; //top level div className attribute's value
+	interactionClassname?: string; //actions (buttons) className attribute's value
+	engagementsClassname?: string; //data counter (h4 tags) className attribute's value
 };
 
+//the interactions (like and comment) component for posts and comments. contain both data (text counters) and actions (like and comment buttons)
 const SocialInteractions: React.FC<Props> = function ({
 	itemID,
 	likeList,
@@ -32,31 +33,31 @@ const SocialInteractions: React.FC<Props> = function ({
 	interactionClassname,
 	engagementsClassname,
 }) {
-	const dispatch = useDispatch<AppDispatch>();
-	const token = getToken();
+	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
+	const token = getToken(); //JWT token
 	const { _id: userID } = useSelector((state: RootState) => state.user);
 	const [isLiked, setIsLiked] = useState<boolean>(
 		likeList?.some((like) => like.user._id === userID) as boolean
-	);
+	); //user's boolean like state of the item
 	const [displayNewComment, setDisplayNewComment] = useState<boolean>(false);
 	const actionType: "createComment" | "createCommentReply" =
-		model === "posts" ? "createComment" : "createCommentReply";
+		model === "posts" ? "createComment" : "createCommentReply"; //createComment for commenting posts, createCommentReply for commenting comments
 
 	const likeButtonClickHandler = function (event: React.MouseEvent) {
 		event.preventDefault();
 		if (isLiked) {
 			//unlike
 			dispatch(likeAndUnlike(token!, itemID, "unlike", model));
-			setIsLiked(false);
+			setIsLiked(false); //update user's like state
 		} else {
 			//like
 			dispatch(likeAndUnlike(token!, itemID, "like", model));
-			setIsLiked(true);
+			setIsLiked(true); //update user's like state
 		}
 	};
 
 	const commentIconClickHandler = function () {
-		setDisplayNewComment((prevState) => !prevState);
+		setDisplayNewComment((prevState) => !prevState); //toggle hide/display state of the NewComment component
 	};
 
 	return (

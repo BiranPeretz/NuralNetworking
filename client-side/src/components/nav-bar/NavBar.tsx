@@ -10,10 +10,10 @@ import groupsFeedIcon from "../../assets/icons/nav-icons/groups";
 import pagesFeedIcon from "../../assets/icons/nav-icons/pages";
 import Logo from "../../assets/Logo";
 import ProfilePicture from "../UI/ProfilePicture";
-import SearchInput from "../UI/SearchInput";
 import Notifications from "./notifications/Notifications";
 import GlobalSearch from "./GlobalSearch";
 
+//top level navigation bar component, containing app's name and logo, feed by type buttons, global search, notifications, and user's profile picture and logout button
 const NavBar: React.FC = function () {
 	const location = useLocation();
 	const logoutHandler = useLogout();
@@ -52,12 +52,6 @@ const NavBar: React.FC = function () {
 			</div>
 			<div className={classes["nav__right-container"]}>
 				<GlobalSearch />
-				{/* <SearchInput
-					className={classes["nav__search"]}
-					inputType="text"
-					inputName="global-search"
-					placeholder="Search everywhere (using full words)"
-				/> */}
 				<div className={classes["nav__user"]}>
 					<Notifications
 						displayNotifications={displayNotifications}

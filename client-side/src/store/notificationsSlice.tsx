@@ -21,6 +21,7 @@ const notificationsSlice = createSlice({
 	name: "notifications",
 	initialState,
 	reducers: {
+		//reset slice's state data
 		clearNotificationsData: function () {
 			const newState: stateType = {
 				notifications: [],
@@ -56,6 +57,7 @@ const notificationsSlice = createSlice({
 			state.isLoading = false;
 			state.error = action.payload;
 		},
+		//set the isRead value for singular notification
 		setReadNotification: function (
 			state,
 			action: PayloadAction<{ _id: string }>
@@ -66,6 +68,7 @@ const notificationsSlice = createSlice({
 				}
 			});
 		},
+		//mark all notifications as read
 		setReadAllNotification: function (state) {
 			if (state.notifications?.length > 0) {
 				state.notifications?.forEach((item) => {
