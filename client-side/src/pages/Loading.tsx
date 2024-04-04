@@ -1,11 +1,12 @@
 import React from "react";
 import classes from "./LoadingPage.module.css";
-import { MoonLoader } from "react-spinners";
+import { MoonLoader } from "react-spinners"; //loading spinners
 
 type Props = {
 	children?: React.ReactNode;
 };
 
+//loading page component for this application. renders robot face with loading spinners as eyes
 const LoadingPage: React.FC<Props> = function (props) {
 	return (
 		<div className={classes.container}>
@@ -16,13 +17,11 @@ const LoadingPage: React.FC<Props> = function (props) {
 					</div>
 					<div className={classes.face}>
 						<div className={classes.eyes}>
-							{/* <div className={classes["left-eye"]}></div> */}
 							<MoonLoader
 								size="50px"
 								color="#fff"
 								className={classes["left-eye"]}
 							/>
-							{/* <div className={classes["right-eye"]}></div> */}
 							<MoonLoader
 								size="50px"
 								color="#fff"

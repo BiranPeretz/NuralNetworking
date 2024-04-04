@@ -85,7 +85,11 @@ exports.cloudinaryImageUpload = async function (req, res, next) {
 			});
 		}
 	} catch (error) {
-		console.log(error);
+		//delete local file
+		if (req?.file?.path) {
+			await fs.promises.unlink(req.file.path);
+		}
+
 		//if internal request throw the error to calling function
 		if (req.body.internalRequest) {
 			throw error;
