@@ -20,7 +20,11 @@ const imageRouter = require("./routes/imageRoutes");
 
 const app = express();
 
-const authorizedOrigins = ["http://localhost:5173", "http://localhost:4173"];
+const authorizedOrigins = [
+	"http://localhost:5173",
+	"http://localhost:4173",
+	"https://nuralnetworking.onrender.com",
+];
 const corsOptions = {
 	origin: function (origin, callback) {
 		if (authorizedOrigins.includes(origin) || !origin) {
