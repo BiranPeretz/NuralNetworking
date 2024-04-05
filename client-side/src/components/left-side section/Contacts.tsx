@@ -43,10 +43,14 @@ const Contacts: React.FC<Props> = function (props) {
 		if (searchRef?.current?.value) {
 			timerRef.current = setTimeout(() => {
 				//executes when timer reach 0
-				if (Array.isArray(userSlice[props.displayList])) {
+
+				const list = userSlice[props.displayList] as Array<
+					friendConnectionType | groupConnectionType | pageConnectionType
+				>;
+				if (Array.isArray(list)) {
 					//set filter displayed list by name via search string
 					setList(
-						userSlice[props.displayList].filter((item: any) =>
+						list.filter((item: any) =>
 							item[contactType]?.name
 								?.toLowerCase()
 								.includes(searchRef?.current?.value)
