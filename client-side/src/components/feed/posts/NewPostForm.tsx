@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useState } from "react";
 import classes from "./NewPostForm.module.css";
 import getToken from "../../../util/getToken";
 import PostHeader from "./PostHeader";
@@ -41,6 +41,8 @@ const NewPostForm: React.FC<Props> = function (props) {
 		handleSubmit,
 		setError,
 		formState: { errors, isSubmitting },
+		watch,
+		setValue,
 	} = useForm<FormFields>({
 		resolver: zodResolver(newPostSchema),
 	});
@@ -52,7 +54,6 @@ const NewPostForm: React.FC<Props> = function (props) {
 		useState<boolean>(false); //file upload modal display state
 	const [imageFile, setImageFile] = useState<any>(); //uploaded image file
 	const [selectedOption, setSelectedOption] = useState<any>(undefined);
-	const contentRef = useRef<HTMLTextAreaElement>(null);
 	const hostID: socialItemType | undefined = props.hostsArray?.find(
 		(item) => item?._id === selectedOption?.value
 	); //the host item, either group or page
@@ -90,9 +91,7 @@ const NewPostForm: React.FC<Props> = function (props) {
 
 	//insert emojies to the end of the text
 	const addEmojiHandler = function (emoji: any) {
-		if (contentRef?.current) {
-			contentRef.current.value += emoji?.native || "";
-		}
+		setValue("content", watch("content") + emoji?.native || "");
 	};
 
 	return (
