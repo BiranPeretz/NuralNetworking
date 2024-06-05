@@ -12,6 +12,7 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 import ResetPasswordForm from "./ResetPasswordForm";
 import SendVerificationForm from "./SendVerificationForm";
 import VerifyEmailForm from "./VerifyEmailForm";
+import GuestLogin from "../UI/GuestLogin";
 
 //this type holds all possible pre-authentication modal's forms as their string name
 export type PreAuthModalsNames =
@@ -160,6 +161,9 @@ const Welcome: React.FC<Props> = function (props) {
 						<h1 className={classes["app__name"]}>Neural Networking</h1>
 					</div>
 					<div className={classes["buttons__container"]}>
+						<GuestLogin
+							className={`${classes.button} ${classes["invert-button"]}`}
+						/>
 						<RectangleButton
 							className={classes.button}
 							name="login"
@@ -168,7 +172,7 @@ const Welcome: React.FC<Props> = function (props) {
 							Login
 						</RectangleButton>
 						<RectangleButton
-							className={`${classes.button} ${classes["invert-button"]}`}
+							className={classes.button}
 							name="sign-up"
 							onClick={displayModalHandler.bind(null, "signup", undefined)}
 						>
