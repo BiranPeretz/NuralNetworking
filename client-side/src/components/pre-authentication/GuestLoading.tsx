@@ -11,7 +11,7 @@ type Props = {
 	originModalName?: PreAuthModalsNames;
 };
 
-//Loading modal for guest login due to deployment's slow cold start
+//loading modal for guest login due to deployment's slow cold start
 const GuestLoading: React.FC<Props> = function (props) {
 	return (
 		<>
