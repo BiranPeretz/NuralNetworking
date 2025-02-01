@@ -115,6 +115,7 @@ const LoginForm: React.FC<Props> = function (props) {
 					{errors?.root?.message}
 				</span>
 			)}
+
 			<LabledInput
 				{...register("email")}
 				type="text"
@@ -136,6 +137,7 @@ const LoginForm: React.FC<Props> = function (props) {
 			>
 				Forgot password
 			</span>
+
 			<button
 				disabled={isSubmitting}
 				className={`${classes.submit} ${

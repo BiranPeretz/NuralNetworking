@@ -62,3 +62,16 @@ button.submit.disabled-button {
 button.submit.disabled-button:hover {
 	transform: none;
 }
+
+.loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.first-login-text {
+	font-family: "Poppins", sans-serif;
+	font-size: 1rem;
+	color: #7e7e7e;
+}

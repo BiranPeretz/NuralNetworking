@@ -13,6 +13,7 @@ import ResetPasswordForm from "./ResetPasswordForm";
 import SendVerificationForm from "./SendVerificationForm";
 import VerifyEmailForm from "./VerifyEmailForm";
 import GuestLogin from "../UI/GuestLogin";
+import GuestLoading from "./GuestLoading";
 
 //this type holds all possible pre-authentication modal's forms as their string name
 export type PreAuthModalsNames =
@@ -22,7 +23,8 @@ export type PreAuthModalsNames =
 	| "forgotPassword"
 	| "resetPassword"
 	| "sendVerification"
-	| "verifyEmail";
+	| "verifyEmail"
+	| "guestLogin";
 
 type Props = {
 	children?: React.ReactNode;
@@ -141,6 +143,18 @@ const Welcome: React.FC<Props> = function (props) {
 					),
 				});
 				break;
+			case "guestLogin":
+				setModalState({
+					display: true,
+					title: "Guest Login",
+					child: (
+						<GuestLoading
+							changeModal={displayModalHandler}
+							originModalName={sourceModalName}
+						/>
+					),
+				});
+				break;
 		}
 	};
 
@@ -163,6 +177,11 @@ const Welcome: React.FC<Props> = function (props) {
 					<div className={classes["buttons__container"]}>
 						<GuestLogin
 							className={`${classes.button} ${classes["invert-button"]}`}
+							displayLoginModal={displayModalHandler.bind(
+								null,
+								"guestLogin",
+								undefined
+							)}
 						/>
 						<RectangleButton
 							className={classes.button}

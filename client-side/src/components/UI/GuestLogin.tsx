@@ -6,16 +6,22 @@ import { authenticateUser } from "../../store/userSlice";
 import RectangleButton from "./RectangleButton";
 
 type Props = {
+	displayLoginModal: () => void;
 	className?: string;
 };
 
 //form component of app's login. cradentials are email and password. successful submit either authenticate user and navigate to feed, or, change modal to CreateProfileForm if the user haven't created he's profile
-const GuestLogin: React.FC<Props> = function ({ className }) {
+const GuestLogin: React.FC<Props> = function ({
+	displayLoginModal,
+	className,
+}) {
 	const navigate = useNavigate();
 	const dispatch = useDispatch<AppDispatch>(); //store's thunks dispatch function
 
 	//form's submit function, sends login request to server and authenticates user or display encountered errors
 	const guestLoginHandler = async function () {
+		//display the login modal before executing login request
+		displayLoginModal();
 		try {
 			const cradentials = {
 				email: import.meta.env.VITE_GUEST_USER_EMAIL,
@@ -62,7 +68,6 @@ const GuestLogin: React.FC<Props> = function ({ className }) {
 			navigate("/feed");
 		} catch (error) {
 			console.log(error);
-			//TODO: handle error
 		}
 	};
 
